@@ -11,11 +11,12 @@ python = "^3.10"
 opencv-python = ">=4.10.0.84"
 mediapipe = ">=0.10.14"
 scikit-learn = ">=1.5.0"
+numpy = "^2.0.0"
+streamlit = "^1.36.0"
+streamlit-webrtc = "^0.47.7"
 
 [tool.poetry.group.dev.dependencies]
-pytest = ">=8.1.1"
-pytest-cov = ">=5.0.0"
-flake8-pyproject = ">=1.2.3"
+pytest = "*"
 
 [build-system]
 requires = ["poetry-core", "poetry-dynamic-versioning"]
@@ -45,6 +46,9 @@ profile = "black"
 line_length = 88
 skip_gitignore = true
 known_first_party = ["black"]
+
+[tool.bandit]
+skips = ["B403", "B301"]
 
 [[tool.poetry.source]]
 name = "PyPI"

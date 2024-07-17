@@ -4,3 +4,4 @@
 venv/
 *.pickle
 *data/
+*data_mnist/
