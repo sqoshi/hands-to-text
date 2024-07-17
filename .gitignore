@@ -2,6 +2,5 @@
 **/*pycache*
 .venv/
 venv/
-*.pickle
 *data/
 *data_mnist/
