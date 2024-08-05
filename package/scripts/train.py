@@ -10,7 +10,10 @@ with open(
 ) as f:
     data_dict = pickle.load(f)
 
-print(len(data_dict["data"]), len(data_dict["labels"]))
+print(
+    len(data_dict["data"]),
+    len(data_dict["labels"]),
+)
 print([len(k) for k in data_dict["data"]])
 data = np.asarray(data_dict["data"])
 labels = np.asarray(data_dict["labels"])

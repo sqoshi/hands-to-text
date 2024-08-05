@@ -3,11 +3,11 @@ import os
 import cv2
 from mediapipe.python.solutions.hands import Hands
 
-DATA_DIR = "./data1"
+DATA_DIR = "../data/PERSON_NAME"
 if not os.path.exists(DATA_DIR):
     os.makedirs(DATA_DIR)
 
-number_of_classes = 1
+number_of_classes = 26
 dataset_size = 100
 hands = Hands(static_image_mode=True, min_detection_confidence=0.3)
 

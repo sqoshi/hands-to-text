@@ -1,10 +1,10 @@
 
 [tool.poetry]
-name = "hands-to-text"
+name = "htt"
 version = "0.0.0"
 authors = ["Popis <piotrpopis98@icloud.com>"]
 description = ""
-readme = "README.md"
+readme = "../README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -12,8 +12,6 @@ opencv-python = ">=4.10.0.84"
 mediapipe = ">=0.10.14"
 scikit-learn = ">=1.5.0"
 numpy = "^2.0.0"
-streamlit = "^1.36.0"
-streamlit-webrtc = "^0.47.7"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"

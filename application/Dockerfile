@@ -17,4 +17,4 @@ RUN apt-get update && apt-get install -y \
     poetry install --only main && \
     rm -rf /var/lib/apt/lists/*
 
-ENTRYPOINT ["streamlit", "run", "application/stream.py"]
+ENTRYPOINT ["gunicorn", "app.py"]
