@@ -1,3 +1,4 @@
+
 import pickle
 
 import cv2
@@ -9,7 +10,7 @@ from mediapipe.python.solutions.drawing_styles import (
 from mediapipe.python.solutions.drawing_utils import draw_landmarks
 from mediapipe.python.solutions.hands import HAND_CONNECTIONS, Hands
 
-from .data_models import ClassedHandBox, HandBox, Point
+from .models import ClassedHandBox, HandBox, Point
 
 margin = 10
 text_rgb = (0, 0, 0)
