@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y \
     software-properties-common && \
     curl -sSL https://install.python-poetry.org | python3 - && \
     poetry config virtualenvs.in-project true && \
+    poetry update && \
     poetry install --only main && \
     rm -rf /var/lib/apt/lists/*
 

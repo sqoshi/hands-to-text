@@ -89,5 +89,4 @@ jobs:
       - name: Push docker image
         working-directory: ${{ env.app-directory }}
         if: startsWith(github.ref, 'refs/tags/')
-        run: docker push ghcr.io/${{ github.repository }}:0.0.0
-# ${{ github.ref_name }}
+        run: docker push ghcr.io/${{ github.repository }}:${{ github.ref_name }}
