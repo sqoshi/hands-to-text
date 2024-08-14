@@ -13,7 +13,8 @@ flask-cors = "^4.0.1"
 opencv-python = ">=4.10.0.84"
 gunicorn = "^22.0.0"
 g4f = {extras = ["all"], version = "^0.3.2.3"}
-hands-to-text = "*"
+hands-to-text = {path = "../package"}
+
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
