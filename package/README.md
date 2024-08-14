@@ -1,1 +1,1 @@
-# htt - package
+# hands-to-text - package

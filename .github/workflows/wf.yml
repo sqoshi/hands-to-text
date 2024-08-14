@@ -51,8 +51,7 @@ jobs:
         working-directory: ${{env.package-directory}}
         run: |
           poetry install --only main
-          poetry build
-          poetry publish --username __token__ --password ${{ secrets.PYPI_TOKEN }}
+          poetry publish --build --username __token__ --password ${{ secrets.PYPI_TOKEN }}
 
   # Job to build and push the Docker image, only runs on tag
 
