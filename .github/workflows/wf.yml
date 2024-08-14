@@ -52,7 +52,7 @@ jobs:
         run: |
           poetry install --only main
           poetry build
-        # run: poetry publish --username __token__ --password $POETRY_PYPI_TOKEN_PYPI
+          poetry publish --username __token__ --password $PYPI_TOKEN
 
   # Job to build and push the Docker image, only runs on tag
 
