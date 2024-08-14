@@ -82,7 +82,8 @@ jobs:
         working-directory: ${{ env.app-directory }}
         run: |
           echo ${{ github.repository }}
-          ls
+          ls 
+          ls dist/
           docker build -t ghcr.io/${{ github.repository }}:0.0.0 .
       - name: Push docker image
         working-directory: ${{ env.app-directory }}
