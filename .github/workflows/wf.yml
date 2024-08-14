@@ -83,8 +83,8 @@ jobs:
         working-directory: ${{ env.app-directory }}
         run: |
           echo ${{ github.repository }}
-          ls 
-          ls dist/
+          sed -i "s|hands-to-text = {path = \"../package\"}|hands-to-text = {path = \"dist/$VARNAME\"}|" pyproject.toml
+          cat pyproject.toml
           exit 1
           docker build -t ghcr.io/${{ github.repository }}:0.0.0 .
       - name: Push docker image
