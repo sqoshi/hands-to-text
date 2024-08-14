@@ -4,7 +4,7 @@ name = "htt"
 version = "0.0.0"
 authors = ["Popis <piotrpopis98@icloud.com>"]
 description = ""
-readme = "../README.md"
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"

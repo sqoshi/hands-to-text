@@ -1,13 +1,11 @@
 name: CI/CD
 
 on:
-    push:
-      tags:
-      - '*'
+  push:
 
 env:
-    package-directory: ./package
-    POETRY_DYNAMIC_VERSIONING: true
+  package-directory: ./package
+  POETRY_DYNAMIC_VERSIONING: true
 
 jobs:
   # Job to test and install dependencies for the Python app
@@ -18,7 +16,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
       - name: Install Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
@@ -43,7 +41,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
       - run: |
           curl -sSL https://install.python-poetry.org | python3 -
           echo "export PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
@@ -52,11 +50,12 @@ jobs:
       - name: Install dependencies
         working-directory: ${{env.package-directory}}
         run: |
-            poetry install --only main
-            poetry build
+          poetry install --only main
+          poetry build
         # run: poetry publish --username __token__ --password $POETRY_PYPI_TOKEN_PYPI
 
   # Job to build and push the Docker image, only runs on tag
+
 #   build-and-push-docker:
 #     name: Build and Push Docker Image
 #     runs-on: ubuntu-latest
