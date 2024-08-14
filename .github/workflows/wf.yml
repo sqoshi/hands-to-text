@@ -54,9 +54,8 @@ jobs:
           poetry install --only main
           poetry build
       - name: Publish package
-        run:
         if: startsWith(github.ref, 'refs/tags/')
-          poetry publish --username __token__ --password ${{ secrets.PYPI_TOKEN }}
+        run: poetry publish --username __token__ --password ${{ secrets.PYPI_TOKEN }}
 
   # Job to build and push the Docker image, only runs on tag
 
@@ -79,7 +78,5 @@ jobs:
       - name: Push docker image
         working-directory: ${{ env.app-directory }}
         if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          docker push ghcr.io/${{ github.repository }}:0.0.0
-
+        run: docker push ghcr.io/${{ github.repository }}:0.0.0
 # ${{ github.ref_name }}
