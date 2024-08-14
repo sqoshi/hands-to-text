@@ -1,6 +1,6 @@
 import pytest
 import cv2
-from htt import process_frame, draw_classbox, read_hands_models, TextProcessor
+from hands_to_text import process_frame, draw_classbox, read_hands_models, TextProcessor
 
 VIDEO_PATH = "path_to_test_video.mp4"
 EXPECTED_TEXT = "expected sentence based on test video"
