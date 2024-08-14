@@ -11,10 +11,9 @@ python = "^3.10"
 flask = "^3.0.3"
 flask-cors = "^4.0.1"
 opencv-python = ">=4.10.0.84"
-htt = {path = "../package"}
 gunicorn = "^22.0.0"
 g4f = {extras = ["all"], version = "^0.3.2.3"}
-
+hands-to-text = "*"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
