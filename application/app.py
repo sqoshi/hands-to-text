@@ -2,7 +2,7 @@ import cv2
 from flask import Flask, Response, jsonify, render_template, request
 from flask_cors import CORS
 from g4f.client import Client
-from htt.general import draw_classbox, process_frame, read_hands_models
+from htt import draw_classbox, process_frame, read_hands_models, TextProcessor
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS
@@ -28,33 +28,6 @@ def generate_frames():
         yield (b"--frame\r\nContent-Type: image/jpeg\r\n\r\n" + frame + b"\r\n")
 
 
-def remove_repetitions(s: str) -> str:
-    if not s:
-        return ""
-    result = [s[0]]
-    for char in s[1:]:
-        if char != result[-1]:
-            result.append(char)
-    return "".join(result)
-
-
-def filter_continuous_symbols(input_string: str, min_reps: int = 10) -> str:
-    filtered_string = ""
-    current_symbol = None
-    current_count = 0
-
-    for i, symbol in enumerate(input_string):
-        if symbol == current_symbol:
-            current_count += 1
-        else:
-            if current_count >= min_reps:
-                filtered_string += current_symbol * current_count
-            current_symbol = symbol
-            current_count = 1
-    if current_count >= min_reps:
-        filtered_string += current_symbol * current_count
-
-    return remove_repetitions(filtered_string)
 
 
 @app.route("/")
@@ -81,7 +54,7 @@ def start_camera():
 
 @app.route("/get_text_corrected", methods=["GET"])
 def get_text_corrected():
-    return jsonify({"text": filter_continuous_symbols(app.config["RECOGNIZED_TEXT"])})
+    return jsonify({"text": app.config["TEXT_PROCESSOR"].process(app.config["RECOGNIZED_TEXT"])})
 
 
 @app.route("/get_text", methods=["GET"])
@@ -120,6 +93,7 @@ with app.app_context():
     app.config["CAP"] = None
     app.config["CHAT_HISTORY"] = []
     app.config["RECOGNIZED_TEXT"] = ""
+    app.config["TEXT_PROCESSOR"] = TextProcessor()
     app.config["MODEL"], app.config["HANDS"] = read_hands_models(
         "../models/model.pickle"
     )
