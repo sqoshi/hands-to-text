@@ -2,7 +2,7 @@ import cv2
 from flask import Flask, Response, jsonify, render_template, request
 from flask_cors import CORS
 from g4f.client import Client
-from htt import draw_classbox, process_frame, read_hands_models, TextProcessor
+from hands_to_text import draw_classbox, process_frame, read_hands_models, TextProcessor
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS

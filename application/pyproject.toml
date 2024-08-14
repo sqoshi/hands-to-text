@@ -15,7 +15,6 @@ gunicorn = "^22.0.0"
 g4f = {extras = ["all"], version = "^0.3.2.3"}
 hands-to-text = {path = "../package"}
 
-
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
 
