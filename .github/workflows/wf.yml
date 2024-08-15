@@ -80,7 +80,8 @@ jobs:
       - name: Build docker image
         working-directory: ${{ env.app-directory }}
         run: |
-          echo "export VERSION=$(git describe --tags --always)" >> $GITHUB_ENV
+          export VERSION=$(git describe --tags --always)
+          echo "export VERSION=${VERSION}" >> $GITHUB_ENV
           export VARNAME=$(ls dist/ | head -n 1)
           sed -i "s|hands-to-text = {path = \"../package\"}|hands-to-text = {path = \"dist/$VARNAME\"}|" pyproject.toml
           docker build -t ghcr.io/${{ github.repository }}:${VERSION} .
