@@ -80,12 +80,12 @@ jobs:
       - name: Build docker image
         working-directory: ${{ env.app-directory }}
         run: |
-          export VERSION=$(git describe --tags --always)
-          echo "export VERSION=${VERSION}" >> $GITHUB_ENV
-          export VARNAME=$(ls dist/ | head -n 1)
-          sed -i "s|hands-to-text = {path = \"../package\"}|hands-to-text = {path = \"dist/$VARNAME\"}|" pyproject.toml
-          docker build -t ghcr.io/${{ github.repository }}:${VERSION} .
+          export IMG_VERSION=$(git describe --tags --always)
+          echo "export IMG_VERSION=${IMG_VERSION}" >> $GITHUB_ENV
+          export PKG_NAME=$(ls dist/ | head -n 1)
+          sed -i "s|hands-to-text = {path = \"../package\"}|hands-to-text = {path = \"dist/$PKG_NAME\"}|" pyproject.toml
+          docker build -t ghcr.io/${{ github.repository }}:${IMG_VERSION} .
       - name: Push docker image
         working-directory: ${{ env.app-directory }}
         if: startsWith(github.ref, 'refs/tags/')
-        run: docker push ghcr.io/${{ github.repository }}:${VERSION}
+        run: docker push ghcr.io/${{ github.repository }}:${IMG_VERSION}
