@@ -59,9 +59,8 @@ jobs:
           path: ${{ env.package-directory }}/dist/*.whl
       - name: Publish package
         if: startsWith(github.ref, 'refs/tags/')
+        working-directory: ${{env.package-directory}}
         run: poetry publish --username __token__ --password ${{ secrets.PYPI_TOKEN }}
-
-  # Job to build and push the Docker image, only runs on tag
 
   build-and-push-docker:
     name: Build and Push Docker Image
