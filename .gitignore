@@ -1,6 +1,6 @@
 **/*.jpg
 **/*pycache*
-.venv/
-venv/
+**/.venv/
 *data/
 *data_mnist/
+**/dist
