@@ -47,7 +47,6 @@ jobs:
           curl -sSL https://install.python-poetry.org | python3 -
           echo "export PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
           poetry self add poetry-dynamic-versioning
-          echo "export POETRY_DYNAMIC_VERSIONING=true" >> $GITHUB_ENV
       - name: Build package
         working-directory: ${{env.package-directory}}
         run: |
@@ -81,11 +80,11 @@ jobs:
       - name: Build docker image
         working-directory: ${{ env.app-directory }}
         run: |
+          echo "export VERSION=$(git describe --tags --always)" >> $GITHUB_ENV
           export VARNAME=$(ls dist/ | head -n 1)
           sed -i "s|hands-to-text = {path = \"../package\"}|hands-to-text = {path = \"dist/$VARNAME\"}|" pyproject.toml
-          docker build -t ghcr.io/${{ github.repository }}:${{ github.ref_name }} .
-          cat pyproject.toml
+          docker build -t ghcr.io/${{ github.repository }}:${VERSION} .
       - name: Push docker image
         working-directory: ${{ env.app-directory }}
         if: startsWith(github.ref, 'refs/tags/')
-        run: docker push ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+        run: docker push ghcr.io/${{ github.repository }}:${VERSION}
