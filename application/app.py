@@ -2,7 +2,8 @@ import cv2
 from flask import Flask, Response, jsonify, render_template, request
 from flask_cors import CORS
 from g4f.client import Client
-from hands_to_text import draw_classbox, process_frame, read_hands_models, TextProcessor
+from hands_to_text.video import draw_classbox, process_frame, read_hands_models
+from hands_to_text.text import TextProcessor
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS
@@ -26,8 +27,6 @@ def generate_frames():
         frame = buffer.tobytes()
 
         yield (b"--frame\r\nContent-Type: image/jpeg\r\n\r\n" + frame + b"\r\n")
-
-
 
 
 @app.route("/")
@@ -54,7 +53,9 @@ def start_camera():
 
 @app.route("/get_text_corrected", methods=["GET"])
 def get_text_corrected():
-    return jsonify({"text": app.config["TEXT_PROCESSOR"].process(app.config["RECOGNIZED_TEXT"])})
+    return jsonify(
+        {"text": app.config["TEXT_PROCESSOR"].process(app.config["RECOGNIZED_TEXT"])}
+    )
 
 
 @app.route("/get_text", methods=["GET"])

@@ -81,8 +81,6 @@ jobs:
       - name: Build docker image
         working-directory: ${{ env.app-directory }}
         run: |
-          export PKG_NAME=$(ls dist/ | head -n 1)
-          sed -i "s|hands-to-text = {path = \"../package\"}|hands-to-text = {path = \"dist/$PKG_NAME\"}|" pyproject.toml
           docker build -t ghcr.io/${{ github.repository }}:$(git describe --tags --always) .
       - name: Push docker image
         working-directory: ${{ env.app-directory }}
