@@ -12,7 +12,7 @@ COPY /models ./models
 
 WORKDIR /app/application
 
-SHELL ["/bin/sh", "-euo", "pipefail", "-c"]
+SHELL ["/bin/sh", "-eu", "pipefail", "-c"]
 RUN apt-get update && apt-get install --no-install-recommends -y \
     build-essential \
     curl \
