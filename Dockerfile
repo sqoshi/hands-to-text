@@ -9,7 +9,6 @@ COPY /application ./application
 COPY /package ./package
 COPY /models ./models
 
-SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 RUN apt-get update && apt-get install --no-install-recommends -y \
     build-essential \
     curl \
@@ -17,7 +16,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     software-properties-common && \
     curl -sSL https://install.python-poetry.org | python3 - && \
     poetry config virtualenvs.in-project true && \
-    poetry update && \
     poetry install --only main && \
     rm -rf /var/lib/apt/lists/*
 
