@@ -3,13 +3,15 @@ FROM python:3.11-slim
 ENV PATH="/root/.local/bin:/app/.venv/bin:$PATH" \
     HANDS_MODEL_PATH="/app/models/hands"
 
-WORKDIR /app
 
 COPY /application ./application
 COPY /package ./package
 COPY /models ./models
 
-RUN apt-get update && apt-get install -y \
+WORKDIR /application
+
+SHELL ["/bin/sh", "-euo", "pipefail", "-c"]
+RUN apt-get update && apt-get install --no-install-recommends -y \
     build-essential \
     curl \
     ffmpeg libsm6 libxext6 \
@@ -19,4 +21,4 @@ RUN apt-get update && apt-get install -y \
     poetry install --only main && \
     rm -rf /var/lib/apt/lists/*
 
-ENTRYPOINT ["gunicorn", "app:application"]
+ENTRYPOINT ["gunicorn", "application"]
