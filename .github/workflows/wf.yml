@@ -22,7 +22,7 @@ jobs:
     container: hadolint/hadolint:latest-debian
     steps:
       - uses: actions/checkout@v4
-      - run: find . type -f -name Dockerfile -exec hadolint {} +
+      - run: find . -type f -name Dockerfile -exec hadolint {} +
 
   publish-python-package:
     runs-on: ubuntu-latest
