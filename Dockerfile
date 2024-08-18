@@ -4,11 +4,13 @@ ENV PATH="/root/.local/bin:/app/.venv/bin:$PATH" \
     HANDS_MODEL_PATH="/app/models/hands"
 
 
+WORKDIR /app
+
 COPY /application ./application
 COPY /package ./package
 COPY /models ./models
 
-WORKDIR /application
+WORKDIR /app/application
 
 SHELL ["/bin/sh", "-euo", "pipefail", "-c"]
 RUN apt-get update && apt-get install --no-install-recommends -y \
