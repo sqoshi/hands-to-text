@@ -9,7 +9,7 @@ COPY /application ./application
 COPY /package ./package
 COPY /models ./models
 
-RUN apt-get update && apt-get install --no-install-recommends -y \
+RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
     ffmpeg libsm6 libxext6 \

@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: find . -type f -name Dockerfile -exec hadolint {} +
 
-  publish-python-package:
+  build-push-package:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -46,7 +46,7 @@ jobs:
         working-directory: ${{env.package-directory}}
         run: poetry publish --username __token__ --password ${{ secrets.PYPI_TOKEN }}
 
-  build-and-push-docker:
+  build-push-docker:
     permissions:
       packages: write
     runs-on: ubuntu-latest
