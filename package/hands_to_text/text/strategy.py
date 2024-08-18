@@ -1,6 +1,5 @@
-from .abstract import TextProcessingStrategy
+# from transformers import pipeline
 
-from transformers import pipeline
 from .abstract import TextProcessingStrategy
 
 
@@ -41,17 +40,18 @@ class FilterContiniousSymbolsStrategy(TextProcessingStrategy):
         if current_count >= min_reps:
             filtered_string += current_symbol * current_count
 
-        return
+        return filtered_string
 
 
-class UseModelStrategy(TextProcessingStrategy):
-    """
-    A strategy that uses a pre-trained language model for text generation or correction.
-    """
+# class UseModelStrategy(TextProcessingStrategy):
+#     """
+#     A strategy that uses a pre-trained language
+#       model for text generation or correction.
+#     """
 
-    def __init__(self, model_name: str = "gpt-2"):
-        self.model = pipeline("text-generation", model=model_name)
+#     def __init__(self, model_name: str = "gpt-2"):
+#         self.model = pipeline("text-generation", model=model_name)
 
-    def process(self, text: str) -> str:
-        generated = self.model(text, max_length=50, num_return_sequences=1)
-        return generated[0]["generated_text"]
+#     def process(self, text: str) -> str:
+#         generated = self.model(text, max_length=50, num_return_sequences=1)
+#         return generated[0]["generated_text"]

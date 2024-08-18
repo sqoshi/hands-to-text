@@ -13,8 +13,9 @@ hands = Hands(static_image_mode=True, min_detection_confidence=0.3)
 
 cap = cv2.VideoCapture(2)
 for j in range(number_of_classes):
-    if not os.path.exists(os.path.join(DATA_DIR, str(j))):
-        os.makedirs(os.path.join(DATA_DIR, str(j)))
+    parent_dir = os.path.join(DATA_DIR, str(j))
+    if not os.path.exists(parent_dir):
+        os.makedirs(parent_dir)
 
     print("Collecting data for class {}".format(j))
 
@@ -31,19 +32,24 @@ for j in range(number_of_classes):
             cv2.LINE_AA,
         )
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        results = hands.process(frame_rgb)
-        print(results.multi_hand_landmarks is not None)
         cv2.imshow("frame", frame)
         if cv2.waitKey(25) == ord("q"):
             break
 
-    counter = 0
-    while counter < dataset_size:
+    while len(os.listdir(parent_dir)) < dataset_size:
         ret, frame = cap.read()
         cv2.imshow("frame", frame)
         cv2.waitKey(25)
-        cv2.imwrite(os.path.join(DATA_DIR, str(j), "{}.jpg".format(counter)), frame)
-        counter += 1
+        results = hands.process(frame_rgb)
+        if results.multi_hand_landmarks is not None:
+            cv2.imwrite(
+                os.path.join(
+                    DATA_DIR, str(j), "{}.jpg".format(len(os.listdir(parent_dir)) + 1)
+                ),
+                frame,
+            )
+        else:
+            print("No hands landmarks detected, retaking image")
 
 cap.release()
 cv2.destroyAllWindows()

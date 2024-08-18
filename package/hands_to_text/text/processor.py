@@ -1,6 +1,7 @@
 from typing import List, Optional
+
 from .abstract import TextProcessingStrategy
-from .strategy import RemoveRepetitionsStrategy, FilterContiniousSymbolsStrategy
+from .strategy import FilterContiniousSymbolsStrategy, RemoveRepetitionsStrategy
 
 
 class TextProcessor:
