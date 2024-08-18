@@ -17,6 +17,9 @@ prepare: ## Prepare the package and application dependencies
 
 docker-build: ## Build the Docker image
 	docker build \
+	--build-arg http_proxy \
+	--build-arg https_proxy \
+	--build-arg no_proxy \
 	-t ${ARTIFACTORY}sqoshi/hands-to-text:latest \
 	-t ${ARTIFACTORY}sqoshi/hands-to-text:$(VERSION) \
 	.

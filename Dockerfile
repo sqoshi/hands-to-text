@@ -1,4 +1,7 @@
 FROM python:3.11-slim
+ARG http_proxy
+ARG https_proxy
+ARG no_proxy
 
 ENV PATH="/root/.local/bin:/app/.venv/bin:$PATH" \
     HANDS_MODEL_PATH="/app/models/hands"
@@ -12,7 +15,7 @@ COPY /models ./models
 
 WORKDIR /app/application
 
-SHELL ["/bin/sh", "-eu", "pipefail", "-c"]
+SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 RUN apt-get update && apt-get install --no-install-recommends -y \
     build-essential \
     curl \
