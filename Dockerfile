@@ -18,8 +18,7 @@ WORKDIR /app/application
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 RUN apt-get update && apt-get install --no-install-recommends -y \
     build-essential \
-    curl \
-    ffmpeg libsm6 libxext6 \
+    curl ffmpeg git libsm6 libxext6 \
     software-properties-common && \
     curl -sSL https://install.python-poetry.org | python3 - && \
     poetry config virtualenvs.in-project true && \
