@@ -95,10 +95,16 @@ def collect_data(
                 break
             display_instructions(frame, class_id)
             cv2.imshow("frame", frame)
+            if cv2.getWindowProperty("frame", cv2.WND_PROP_VISIBLE) < 1:
+                cap.release()
+                cv2.destroyAllWindows()
+                return
             if cv2.waitKey(25) == ord("q"):
                 break
 
         collect_class_data(class_id, dataset_size, cap, hands, data_dir)
+        if cv2.getWindowProperty("frame", cv2.WND_PROP_VISIBLE) < 1:
+            break
 
     cap.release()
     cv2.destroyAllWindows()

@@ -34,11 +34,18 @@ docker-build: ## Build the Docker image
 	-t ${ARTIFACTORY}sqoshi/hands-to-text:$(VERSION) \
 	.
 
-docker-run-httpdataprep: docker-build-httpdataprep  ## Run the Docker container
-	docker run --rm -it ${ARTIFACTORY}sqoshi/httdataprep:latest --name httdataprep:latest
+docker-run-httdataprep: ## Run the Docker container
+	docker run --rm -it \
+	-e DISPLAY=${DISPLAY} \
+	--name httdataprep \
+	--device /dev/video0:/dev/video0 \
+	-v /tmp/.X11-unix:/tmp/.X11-unix \
+	${ARTIFACTORY}sqoshi/httdataprep:latest
 
 docker-run: docker-build  ## Run the Docker container
-	docker run --rm -it ${ARTIFACTORY}sqoshi/hands-to-text:latest --name htt:latest
+	docker run --rm -it \ 
+	--name htt \
+	${ARTIFACTORY}sqoshi/hands-to-text:latest
  
 help: ## Print help with command name and comment for each target
 	@echo "Available targets:"

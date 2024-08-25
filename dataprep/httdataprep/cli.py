@@ -36,6 +36,7 @@ def collect(
     ),
     capture_device: int = typer.Option(0, "--capture-device", help="Camera device ID"),
 ):
+    """Take hand images."""
     collect_data(data_dir, classes_number, samples_number, capture_device)
     if zip:
         shutil.make_archive("output", "zip", data_dir)
@@ -48,6 +49,7 @@ def process(
         "./data", "--data-dir", "-d", help="Directory with images"
     ),
 ):
+    """Transform images into dataset pickle."""
     logging.info("not implemented %s", data_dir)
 
 
@@ -61,6 +63,7 @@ def upload(
         DEFAULT_KEY, "--key", help="Encryption key for the service account"
     ),
 ):
+    """Upload files to Google Storage."""
     if os.path.exists(file):
         service = initialize_service(key)
         upload_file(file, service)
@@ -74,7 +77,7 @@ def list(
         DEFAULT_KEY, "--key", help="Encryption key for the service account"
     ),
 ):
-    """List files in Google Drive."""
+    """List files in Google Storage."""
     service = initialize_service(key)
     list_files(service)
 
