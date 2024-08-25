@@ -1,6 +1,6 @@
 import logging
 import os
-import socket
+import uuid
 from datetime import datetime
 
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
@@ -9,7 +9,7 @@ from tabulate import tabulate
 
 def upload_file(file_path: str, service):
     d = datetime.now().strftime("%Y%m%d%H%M%S")
-    nm = f"{os.getlogin()}_{socket.gethostname()}"
+    nm = f"{uuid.uuid4().hex}"
     metadata = {"name": f"{nm}_{d}_{os.path.basename(file_path)}"}
     media = MediaFileUpload(
         file_path, mimetype="application/zip", chunksize=256 * 1024, resumable=True

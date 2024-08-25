@@ -36,8 +36,9 @@ docker-build: ## Build the Docker image
 
 docker-run-httdataprep: ## Run the Docker container
 	docker run --rm -it \
-	-e DISPLAY=${DISPLAY} \
+	--network host \
 	--name httdataprep \
+	-e DISPLAY=${DISPLAY} \
 	--device /dev/video0:/dev/video0 \
 	-v /tmp/.X11-unix:/tmp/.X11-unix \
 	${ARTIFACTORY}sqoshi/httdataprep:latest
