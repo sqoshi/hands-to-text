@@ -13,7 +13,7 @@ repos:
         args:
           - --max-line-length=88
           - --per-file-ignores=__init__.py:F401
-          - --ignore=[]
+          - --ignore=[E501]
 
   - repo: https://github.com/pycqa/isort
     rev: 5.13.2
