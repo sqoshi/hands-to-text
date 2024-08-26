@@ -5,7 +5,7 @@ ARG https_proxy
 ARG no_proxy
 
 ENV PATH="/app/.venv/bin:$PATH" \
-    HANDS_MODEL_PATH="/app/models/hands"
+    HANDS_MODEL_PATH="/app/models/hands" 
 
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 RUN apt-get update && apt-get install --no-install-recommends -y \
@@ -13,7 +13,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     rm -rf /var/lib/apt/lists/*
 
 FROM base AS builder
-ENV PATH="/root/.local/bin:$PATH" 
+ENV PATH="/root/.local/bin:$PATH" \
+    POETRY_DYNAMIC_VERSIONING_COMMANDS=""
 
 WORKDIR /app
 
