@@ -1,9 +1,11 @@
+import os
+
 import cv2
 from flask import Flask, Response, jsonify, render_template, request
 from flask_cors import CORS
 from g4f.client import Client
-from hands_to_text.video import draw_classbox, process_frame, read_hands_models
 from hands_to_text.text import TextProcessor
+from hands_to_text.video import draw_classbox, process_frame, read_hands_models
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS
@@ -96,7 +98,7 @@ with app.app_context():
     app.config["RECOGNIZED_TEXT"] = ""
     app.config["TEXT_PROCESSOR"] = TextProcessor()
     app.config["MODEL"], app.config["HANDS"] = read_hands_models(
-        "../models/model.pickle"
+        os.getenv("HANDS_MODEL_PATH", "../models/model.pickle")
     )
 
 

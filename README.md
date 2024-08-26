@@ -5,7 +5,13 @@
 ## Progress
 
 
-# Week I ( -x)
+### Week I ( -x)
 - added possibility to test model on real videos
-- found data for tests
-- created startegies
+- created startegies pattern
+
+### Week II
+- added pipelines for uploading docker image
+- added pipelines for uploading python package
+- configured external pypi and github aritfactory to save packages 
+
+### Week III

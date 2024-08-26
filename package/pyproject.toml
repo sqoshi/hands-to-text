@@ -5,6 +5,7 @@ version = "0.0.0"
 authors = ["Popis <piotrpopis98@icloud.com>"]
 description = ""
 readme = "README.md"
+package-mode = true
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -21,7 +22,7 @@ requires = ["poetry-core", "poetry-dynamic-versioning"]
 build-backend = "poetry_dynamic_versioning.backend"
 
 [tool.poetry-dynamic-versioning]
-enable = true
+enable = false
 pattern = '^v?((?P<epoch>\d+)!)?(?P<base>\d+(\.\d+)*)'
 
 [tool.pytest.ini_options]
