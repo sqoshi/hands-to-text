@@ -18,6 +18,7 @@ WORKDIR /app
 COPY . .
 
 RUN curl -sSL https://install.python-poetry.org | python3 - && \
+    poetry self add "poetry-dynamic-versioning[plugin]" && \
     poetry config virtualenvs.in-project true && \
     poetry install --only main
 
