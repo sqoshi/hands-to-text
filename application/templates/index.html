@@ -16,6 +16,7 @@
           <img id="video" alt="video" />
         </div>
         <div class="button-container">
+          <button class="btn" onclick="stopCamera()">Stop Camera</button>
           <button class="btn" onclick="startCamera()">Start Camera</button>
           <button class="btn" onclick="resetText()">Reset Text</button>
           <button class="btn" onclick="sendChat()">Send Chat</button>
@@ -76,6 +77,17 @@
               document.getElementById("video").style.display = "block";
               document.getElementById("video").src =
                 "{{ url_for('video_feed') }}";
+            } else {
+              alert(data.message);
+            }
+          });
+      }
+      function stopCamera() {
+        fetch("/stop_camera", { method: "POST" })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === "success") {
+              document.getElementById("video").src = "";
             } else {
               alert(data.message);
             }

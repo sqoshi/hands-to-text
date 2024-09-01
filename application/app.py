@@ -19,12 +19,8 @@ warnings.filterwarnings(
 )
 
 text_lock = Lock()
-
-RECOGNIZED_TEXT = ""
-
 app = Flask(__name__)
 CORS(app)
-
 
 log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
@@ -52,13 +48,13 @@ def generate_frames():
 
         img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         chbox = process_frame(img, app.config["MODEL"], app.config["HANDS"])
+
         if chbox:
             draw_classbox(img, chbox)
             with text_lock:
                 app.config["RECOGNIZED_TEXT"] += chbox.class_name
-                app.logger.info(
-                    f"Updated RECOGNIZED_TEXT: {app.config['RECOGNIZED_TEXT']}"
-                )
+                app.logger.info(f"Appended to file: {chbox.class_name}")
+
         ret, buffer = cv2.imencode(".jpg", img)
         if not ret:
             app.logger.error("Failed to convert frame to JPEG")
@@ -81,6 +77,16 @@ def video_feed():
     )
 
 
+@app.route("/stop_camera", methods=["POST"])
+def stop_camera():
+    if app.config["CAP"] is not None:
+        app.config["CAP"].release()
+        app.config["CAP"] = None
+    if app.config["CAP"] and app.config["CAP"].isOpened():
+        return jsonify({"status": "error", "message": "Cannot close camera"})
+    return jsonify({"status": "success"})
+
+
 @app.route("/start_camera", methods=["POST"])
 def start_camera():
     if app.config["CAP"] is not None:
@@ -93,21 +99,19 @@ def start_camera():
 
 @app.route("/get_text_corrected", methods=["GET"])
 def get_text_corrected():
-    return jsonify({"text": app.config["TEXT_PROCESSOR"].process(RECOGNIZED_TEXT)})
+    return jsonify(
+        {"text": app.config["TEXT_PROCESSOR"].process(app.config["RECOGNIZED_TEXT"])}
+    )
 
 
 @app.route("/get_text", methods=["GET"])
 def get_text():
-    with text_lock:
-        recognized_text = app.config.get("RECOGNIZED_TEXT", "")
-    app.logger.info("Current text returned from /get_text: %s", recognized_text)
-    return jsonify({"text": recognized_text})
+    return jsonify({"text": app.config["RECOGNIZED_TEXT"]})
 
 
 @app.route("/reset_text", methods=["POST"])
 def reset_text():
-    with text_lock:
-        app.config["RECOGNIZED_TEXT"] = ""
+    app.config["RECOGNIZED_TEXT"] = ""
     return jsonify({"status": "success"})
 
 
