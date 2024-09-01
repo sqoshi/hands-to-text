@@ -43,11 +43,12 @@ class FilterContiniousSymbolsStrategy(TextProcessingStrategy):
         return filtered_string
 
 
-# class UseModelStrategy(TextProcessingStrategy):
-#     """
-#     A strategy that uses a pre-trained language
-#       model for text generation or correction.
-#     """
+class UseModelStrategy(TextProcessingStrategy):
+    """
+    A strategy that uses a pre-trained language
+      model for text generation or correction.
+    """
+
 
 #     def __init__(self, model_name: str = "gpt-2"):
 #         self.model = pipeline("text-generation", model=model_name)

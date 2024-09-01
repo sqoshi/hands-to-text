@@ -5,7 +5,7 @@ ARG https_proxy
 ARG no_proxy
 
 ENV PATH="/app/.venv/bin:$PATH" \
-    HANDS_MODEL_PATH="/app/models/hands" 
+    HANDS_MODEL_PATH="/app/models/model.pickle" 
 
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 RUN apt-get update && apt-get install --no-install-recommends -y \
@@ -40,4 +40,4 @@ COPY --from=builder /app /app
 
 WORKDIR /app/application
 
-ENTRYPOINT ["gunicorn", "application"]
+ENTRYPOINT ["gunicorn", "-w", "20", "-b", "0.0.0.0:8000", "app:app"]

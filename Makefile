@@ -6,7 +6,8 @@ ARTIFACTORY ?= ""
 .PHONY: run fmt prepare docker-build docker-run help
 
 run: ## Run the application
-	cd /application && poetry run python3 main.py
+	cd /application
+	poetry run gunicorn app:app --reload
 
 fmt: ## Format the code using pre-commit
 	pre-commit run --all
@@ -43,10 +44,8 @@ docker-run-httdataprep: ## Run the Docker container
 	-v /tmp/.X11-unix:/tmp/.X11-unix \
 	${ARTIFACTORY}sqoshi/httdataprep:latest
 
-docker-run: docker-build  ## Run the Docker container
-	docker run --rm -it \ 
-	--name htt \
-	${ARTIFACTORY}sqoshi/hands-to-text:latest
+docker-run: docker-build ## Run the Docker container
+	docker run --network host --name htt --rm -it ${ARTIFACTORY}sqoshi/hands-to-text:latest
  
 help: ## Print help with command name and comment for each target
 	@echo "Available targets:"
