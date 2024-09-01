@@ -8,6 +8,30 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='styles.css') }}"
     />
+  </head>
+  <body>
+    <div class="container">
+      <div class="left">
+        <div class="video-container">
+          <img id="video" alt="video" />
+        </div>
+        <div class="button-container">
+          <button class="btn" onclick="startCamera()">Start Camera</button>
+          <button class="btn" onclick="resetText()">Reset Text</button>
+          <button class="btn" onclick="sendChat()">Send Chat</button>
+        </div>
+      </div>
+      <div class="right">
+        <textarea class="text-area" id="text-area" readonly></textarea>
+        <textarea
+          class="text-area"
+          id="text-area-corrected"
+          readonly
+        ></textarea>
+        <textarea class="text-area" id="chat-area" readonly></textarea>
+      </div>
+    </div>
+
     <script>
       function updateTextCorrected() {
         fetch("/get_text_corrected")
@@ -19,10 +43,21 @@
 
       function updateText() {
         fetch("/get_text")
-          .then((response) => response.json())
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
           .then((data) => {
-            document.getElementById("text-area").value = data.text;
-          });
+            console.log('Update Text - Fetched data:', data);
+            if (data && data.text !== undefined) {
+              document.getElementById("text-area").value = data.text;
+            } else {
+              console.warn('No text data found');
+            }
+          })
+          .catch((error) => console.error('Error fetching text:', error));
       }
 
       function resetText() {
@@ -41,8 +76,6 @@
               document.getElementById("video").style.display = "block";
               document.getElementById("video").src =
                 "{{ url_for('video_feed') }}";
-              setInterval(updateText, 1000);
-              setInterval(updateTextCorrected, 1000);
             } else {
               alert(data.message);
             }
@@ -75,19 +108,18 @@
             document.getElementById("chat-area").value = data.chat;
           });
       }
-    </script>
-  </head>
-  <body>
-    <h1>Hand Gesture Recognition</h1>
-    <button onclick="startCamera()">Start Camera</button>
-    <br /><br />
-    <img id="video" alt="video"/>
-    <textarea class="text-area" id="text-area" readonly></textarea>
-    <textarea class="text-area" id="text-area-corrected" readonly></textarea>
-    <br />
-    <button onclick="resetText()">Reset Text</button>
+      // Automatically start updating text and corrected text every 2 seconds
+      function startAutoUpdates() {
+        updateText();
+        updateTextCorrected();
+        setInterval(updateText, 2000); // Update text every 2 seconds
+        setInterval(updateTextCorrected, 2000); // Update corrected text every 2 seconds
+      }
 
-    <textarea class="text-area" id="chat-area" readonly></textarea>
-    <button onclick="sendChat()">Send Chat</button>
+      // Initialize auto updates when the page loads
+      window.onload = function () {
+        startAutoUpdates();
+      };
+    </script>
   </body>
 </html>

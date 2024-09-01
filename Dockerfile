@@ -40,4 +40,4 @@ COPY --from=builder /app /app
 
 WORKDIR /app/application
 
-ENTRYPOINT ["gunicorn", "-w", "20", "-b", "0.0.0.0:8000", "app:app"]
+ENTRYPOINT ["gunicorn", "-c", "gunicorn.conf.py", "app:app"]

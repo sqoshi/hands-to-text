@@ -1,4 +1,8 @@
+import logging
 import os
+import warnings
+from logging.handlers import RotatingFileHandler
+from threading import Lock
 
 import cv2
 from flask import Flask, Response, jsonify, render_template, request
@@ -7,27 +11,61 @@ from g4f.client import Client
 from hands_to_text.text import TextProcessor
 from hands_to_text.video import draw_classbox, process_frame, read_hands_models
 
+warnings.filterwarnings(
+    "ignore", category=DeprecationWarning, module="google.protobuf.symbol_database"
+)
+warnings.filterwarnings(
+    "ignore", category=UserWarning, module="google.protobuf.symbol_database"
+)
+
+text_lock = Lock()
+
+RECOGNIZED_TEXT = ""
+
 app = Flask(__name__)
-CORS(app)  # Enable CORS
+CORS(app)
+
+
+log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+if not app.debug:
+    handler = RotatingFileHandler("/tmp/app.log", maxBytes=10000, backupCount=1)
+    handler.setLevel(logging.DEBUG)
+    handler.setFormatter(logging.Formatter(log_format))
+    app.logger.addHandler(handler)
+
+app.logger.setLevel(logging.DEBUG)
 
 
 def generate_frames():
-    while app.config["CAP"] is not None and app.config["CAP"].isOpened():
+    while True:
+        if app.config["CAP"] is None or not app.config["CAP"].isOpened():
+            app.logger.error("Camera not available")
+            yield b"--frame\r\nContent-Type: image/jpeg\r\n\r\n" + b""
+            continue
+
         success, frame = app.config["CAP"].read()
         if not success:
-            print("Failed to capture frame")
+            app.logger.error("Failed to capture frame")
+            yield b"--frame\r\nContent-Type: image/jpeg\r\n\r\n" + b""
             continue
+
         img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         chbox = process_frame(img, app.config["MODEL"], app.config["HANDS"])
         if chbox:
             draw_classbox(img, chbox)
-            app.config["RECOGNIZED_TEXT"] += chbox.class_name
+            with text_lock:
+                app.config["RECOGNIZED_TEXT"] += chbox.class_name
+                app.logger.info(
+                    f"Updated RECOGNIZED_TEXT: {app.config['RECOGNIZED_TEXT']}"
+                )
         ret, buffer = cv2.imencode(".jpg", img)
         if not ret:
-            print("Failed to convert frame to JPEG")
+            app.logger.error("Failed to convert frame to JPEG")
+            yield b"--frame\r\nContent-Type: image/jpeg\r\n\r\n" + b""
             continue
-        frame = buffer.tobytes()
 
+        frame = buffer.tobytes()
         yield (b"--frame\r\nContent-Type: image/jpeg\r\n\r\n" + frame + b"\r\n")
 
 
@@ -55,19 +93,21 @@ def start_camera():
 
 @app.route("/get_text_corrected", methods=["GET"])
 def get_text_corrected():
-    return jsonify(
-        {"text": app.config["TEXT_PROCESSOR"].process(app.config["RECOGNIZED_TEXT"])}
-    )
+    return jsonify({"text": app.config["TEXT_PROCESSOR"].process(RECOGNIZED_TEXT)})
 
 
 @app.route("/get_text", methods=["GET"])
 def get_text():
-    return jsonify({"text": app.config["RECOGNIZED_TEXT"]})
+    with text_lock:
+        recognized_text = app.config.get("RECOGNIZED_TEXT", "")
+    app.logger.info("Current text returned from /get_text: %s", recognized_text)
+    return jsonify({"text": recognized_text})
 
 
 @app.route("/reset_text", methods=["POST"])
 def reset_text():
-    app.config["RECOGNIZED_TEXT"] = ""
+    with text_lock:
+        app.config["RECOGNIZED_TEXT"] = ""
     return jsonify({"status": "success"})
 
 
@@ -77,14 +117,23 @@ def send_chat():
     text = data.get("text", "")
     app.config["CHAT_HISTORY"].append(f"You: {text}")
     client = Client()
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": text}],
-    )
-    assistant_response = response.choices[0].message.content
-    app.logger.debug("Assistant response: %s", assistant_response)
-    app.config["CHAT_HISTORY"].append(f"Assistant: {assistant_response}")
-    return jsonify({"status": "success"})
+    try:
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": text}],
+        )
+        assistant_response = response.choices[0].message.content
+        app.logger.debug("Assistant response: %s", assistant_response)
+        app.config["CHAT_HISTORY"].append(f"Assistant: {assistant_response}")
+        return jsonify({"status": "success"})
+    except Exception as e:
+        app.logger.error("Error during chat completion: %s", e)
+        return jsonify(
+            {
+                "status": "error",
+                "message": "Failed to get a response from the assistant",
+            }
+        )
 
 
 @app.route("/get_chat", methods=["GET"])
@@ -103,4 +152,4 @@ with app.app_context():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, threaded=False)

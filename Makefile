@@ -7,9 +7,7 @@ ARTIFACTORY ?=
 
 run: ## Run the application
 	cd application
-	poetry shell
-	poetry update
-	poetry run gunicorn app:app --reload
+	.venv/bin/python3 -m gunicorn app:app -c gunicorn.conf.py --reload
 
 fmt: ## Format the code using pre-commit
 	pre-commit run --all
