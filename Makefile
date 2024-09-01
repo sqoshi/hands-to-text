@@ -1,20 +1,22 @@
 VERSION=$(or $(shell git describe --tags --always), latest)
 
-ARTIFACTORY ?= ""
+ARTIFACTORY ?= 
 
 .ONESHELL:
 .PHONY: run fmt prepare docker-build docker-run help
 
 run: ## Run the application
-	cd /application
+	cd application
+	poetry shell
+	poetry update
 	poetry run gunicorn app:app --reload
 
 fmt: ## Format the code using pre-commit
 	pre-commit run --all
 
 prepare: ## Prepare the package and application dependencies
-	cd /package && poetry install
-	cd /application && poetry install
+	cd ./package && poetry install && cd ..
+	cd ./application && poetry install && cd ..
 
 docker-build-httdataprep: ## Build the Docker image
 	cd dataprep

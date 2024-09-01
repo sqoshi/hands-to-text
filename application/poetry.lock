@@ -1170,7 +1170,7 @@ files = [
 
 [[package]]
 name = "hands-to-text"
-version = "0.0.0"
+version = "0.1.0.post21.dev0+ae0b8ce"
 description = ""
 optional = false
 python-versions = "^3.10"

@@ -5,13 +5,12 @@ from .strategy import FilterContiniousSymbolsStrategy, RemoveRepetitionsStrategy
 
 
 class TextProcessor:
-    def __init__(
-        self,
-        strategies: Optional[List[TextProcessingStrategy]] = (
-            RemoveRepetitionsStrategy,
-            FilterContiniousSymbolsStrategy,
-        ),
-    ):
+    def __init__(self, strategies: Optional[List[TextProcessingStrategy]] = None):
+        if strategies is None:
+            strategies = [
+                RemoveRepetitionsStrategy(),
+                FilterContiniousSymbolsStrategy(),
+            ]
         self.strategies = strategies
 
     def process(self, text: str) -> str:
