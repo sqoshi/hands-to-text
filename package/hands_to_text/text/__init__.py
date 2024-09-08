@@ -1,7 +1,3 @@
 from .abstract import TextProcessingStrategy
 from .processor import TextProcessor
-from .strategy import (
-    FilterContiniousSymbolsStrategy,
-    RemoveRepetitionsStrategy,
-    UseModelStrategy,
-)
+from .strategy import *  # noqa

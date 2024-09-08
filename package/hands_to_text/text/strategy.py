@@ -1,4 +1,4 @@
-# from transformers import pipeline
+from transformers import pipeline
 
 from .abstract import TextProcessingStrategy
 
@@ -43,16 +43,54 @@ class FilterContiniousSymbolsStrategy(TextProcessingStrategy):
         return filtered_string
 
 
-class UseModelStrategy(TextProcessingStrategy):
+class LeverageLanguageModelStrategy(TextProcessingStrategy):
     """
-    A strategy that uses a pre-trained language
-      model for text generation or correction.
+    A strategy that uses a language model (like GPT-2) to correct noisy sequences.
     """
 
+    def __init__(self, model_name: str = "gpt2"):
+        self.model = pipeline("text-generation", model=model_name)
 
-#     def __init__(self, model_name: str = "gpt-2"):
-#         self.model = pipeline("text-generation", model=model_name)
+    def process(self, text: str) -> str:
+        prompt = (
+            "The following sequence of letters was collected from sign language "
+            "classification in video frames. The sequence contains repeated letters "
+            "due to frame-by-frame detection. Please correct the sequence into a valid word or phrase. "
+            "For example, 'HHHHHEEELLLLOOOO' should become 'HELLO'. Correct this sequence: "
+            f"'{text}'"
+        )
+        generated = self.model(prompt, max_length=50, num_return_sequences=1)
+        corrected_text = generated[0]["generated_text"].strip()
+        return corrected_text
+
+
+# from hmmlearn import hmm
+# class ProbabilisticSmoothingStrategy(TextProcessingStrategy):
+#     """
+#     A strategy using Hidden Markov Model (HMM) for probabilistic smoothing.
+#     """
+
+#     def __init__(self):
+#         self.model = self._train_hmm_model()
+
+#     def _train_hmm_model(self):
+#         model = hmm.MultinomialHMM(n_components=26)
+#         # Fake training data (alphabet as sequence, needs real training)
+#         X = np.array([[i] for i in range(26)] * 10)  # Simplified
+#         model.fit(X)
+#         return model
 
 #     def process(self, text: str) -> str:
-#         generated = self.model(text, max_length=50, num_return_sequences=1)
-#         return generated[0]["generated_text"]
+#         # Map each character to an integer for HMM
+#         letter_to_int = {chr(i + 65): i for i in range(26)}  # A-Z
+#         int_to_letter = {i: chr(i + 65) for i in range(26)}
+
+#         int_sequence = np.array([[letter_to_int[char]] for char in text if char in letter_to_int])
+
+#         # Predict the most likely sequence
+#         logprob, predicted_sequence = self.model.decode(int_sequence, algorithm="viterbi")
+
+#         # Convert back to letters
+#         smoothed_text = ''.join([int_to_letter[i] for i in predicted_sequence])
+
+#         return smoothed_text

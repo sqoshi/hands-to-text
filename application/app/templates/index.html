@@ -76,7 +76,7 @@
             if (data.status === "success") {
               document.getElementById("video").style.display = "block";
               document.getElementById("video").src =
-                "{{ url_for('video_feed') }}";
+                "{{ url_for('video.video_feed') }}";
             } else {
               alert(data.message);
             }
