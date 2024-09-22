@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hand Gesture Recognition</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="left">
+        <div class="video-container">
+          <img id="video" alt="video" />
+        </div>
+        <div class="button-container">
+          <button class="btn" onclick="manageCamera('stop')">Stop Camera</button>
+          <button class="btn" onclick="manageCamera('start')">Start Camera</button>
+          <button class="btn" onclick="resetText()">Reset Text</button>
+          <button class="btn" onclick="sendChat()">Send Chat</button>
+        </div>
+      </div>
+      <div class="right">
+        <textarea class="text-area" id="text-area" readonly></textarea>
+        <textarea class="text-area" id="text-area-corrected" readonly></textarea>
+        <textarea class="text-area" id="chat-area" readonly></textarea>
+      </div>
+    </div>
+
+    <script>
+      let textUpdateInterval;
+      let textCorrectedUpdateInterval;
+
+      function updateTextCorrected() {
+        fetch("/text/?corrected=true")
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            document.getElementById("text-area-corrected").value = data.text;
+          });
+      }
+
+      function updateText() {
+        fetch("/text/")
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("text-area").value = data.text;
+          });
+      }
+
+      function resetText() {
+        fetch("/text/", { method: "DELETE" })
+          .then((response) => response.json())
+          .then(() => {
+            updateText();
+          });
+      }
+
+      function manageCamera(action) {
+        fetch(`/video/camera?action=${action}`, { method: "PUT" })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === "success") {
+              if (action === "start") {
+                document.getElementById("video").style.display = "block";
+                document.getElementById("video").src = "/video/feed";
+                startAutoUpdates(); // Start updating text when camera starts
+              } else {
+                document.getElementById("video").src = "";
+                stopAutoUpdates(); // Stop updating text when camera stops
+              }
+            } else {
+              alert(data.message);
+            }
+          });
+      }
+
+      function sendChat() {
+        const text = document.getElementById("text-area-corrected").value;
+        fetch("/chat/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ text: text }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === "success") {
+              updateChat();
+            } else {
+              alert(data.message);
+            }
+          });
+      }
+
+      function updateChat() {
+        fetch("/chat/")
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("chat-area").value = data.chat;
+          });
+      }
+
+      function startAutoUpdates() {
+        updateText();
+        updateTextCorrected();
+        textUpdateInterval = setInterval(updateText, 2000); // Update text every 2 seconds
+        textCorrectedUpdateInterval = setInterval(updateTextCorrected, 2000); // Update corrected text every 2 seconds
+      }
+
+      function stopAutoUpdates() {
+        clearInterval(textUpdateInterval);
+        clearInterval(textCorrectedUpdateInterval);
+      }
+
+      // Initialize auto updates when the page loads
+      window.onload = function () {
+        // You may choose to not start auto updates until the camera is started
+        // startAutoUpdates();
+      };
+    </script>
+  </body>
+</html>

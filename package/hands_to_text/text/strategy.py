@@ -59,9 +59,31 @@ class LeverageLanguageModelStrategy(TextProcessingStrategy):
             "For example, 'HHHHHEEELLLLOOOO' should become 'HELLO'. Correct this sequence: "
             f"'{text}'"
         )
-        generated = self.model(prompt, max_length=50, num_return_sequences=1)
+        generated = self.model(prompt, max_length=500, num_return_sequences=1)
         corrected_text = generated[0]["generated_text"].strip()
         return corrected_text
+
+
+class MajorityVoteStrategy(TextProcessingStrategy):
+    """
+    Smooths sequences by using a sliding window and taking the most frequent letter
+    in the window to reduce noise.
+
+    Example (with window_size=3):
+    Input:  "HHHHHEEELLLLOOOO"
+    Output: "HHHHHEEELLOOOO"
+    """
+
+    def process(self, text: str, window_size: int = 3) -> str:
+        if not text:
+            return ""
+        smoothed_text = []
+        for i in range(len(text)):
+            start = max(0, i - window_size // 2)
+            end = min(len(text), i + window_size // 2 + 1)
+            window = text[start:end]
+            smoothed_text.append(max(set(window), key=window.count))
+        return "".join(smoothed_text)
 
 
 # from hmmlearn import hmm

@@ -45,11 +45,11 @@ ret, frame = cap.read()
 if ret:
     # Process the frame
     classed_hand_box = process_frame(frame, model, hands)
-    
+
     # Draw the classified hand box on the frame
     if classed_hand_box:
         draw_classbox(frame, classed_hand_box)
-    
+
     # Display the frame with drawn bounding box
     cv2.imshow("Hand Detection", frame)
     cv2.waitKey(0)

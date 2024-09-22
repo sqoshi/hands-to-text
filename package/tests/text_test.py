@@ -7,13 +7,12 @@ from hands_to_text.text.strategy import (
 )
 from tabulate import tabulate
 
-# Define global test cases with input and expected output
 GLOBAL_TEST_CASES = [
     ("HHHHHEEEEEELLLLLOOOOOO", "HELLO"),
     ("AAAABBBCCCDDDDEEEE", "ABCDE"),
     ("TTHHHEEEELLLLLOOOO", "THELO"),
     ("THHISSSSSS IIIISSSS A TTEEEESST", "THIS IS A TEST"),
-    ("AAAAAAAABBBBCCCCDDDD", "ABCD"),  # Complex test case
+    ("AAAAAAAABBBBCCCCDDDD", "ABCD"),
     (
         "TTThhee ccoommmaandd wiiiilllll ttakkeee iimmmaagesss foor dddiffereentt cllasseess (succh as thhe aaallphabettt in ssignn llaanguagge) aandd sttoorree thhem in ttthhe sppecfiiieed ddiiirreecttoorrryy. EEaacch cllassss wiiill hhhaave bby iimmmaagess colllected ussiiing llannnddmarkk detectiiionnn. TThhe colllecttionn wiiilll ccconttinuuue untiill all iimmmagesss aarree gathheereed ffoor eeach cllassss",
         "The command will take images for different classes (such as the alphabet in sign language) and store them in the specified directory. Each class will have images collected using landmark detection. The collection will continue until all images are gathered for each class",
@@ -21,7 +20,6 @@ GLOBAL_TEST_CASES = [
 ]
 
 
-# Define fixtures
 @pytest.fixture
 def remove_reps_strategy():
     return RemoveRepetitionsStrategy()
@@ -37,7 +35,6 @@ def language_model_strategy():
     return LeverageLanguageModelStrategy()
 
 
-# Define text processor fixture with various strategy combinations
 @pytest.fixture(
     params=[
         [RemoveRepetitionsStrategy],
@@ -61,14 +58,12 @@ def text_processor(request):
 results = []
 
 
-# Function to calculate accuracy between output and expected output
 def accuracy_check(output: str, expected: str) -> float:
     total_chars = len(expected)
     matched_chars = sum(e == o for e, o in zip(expected, output))
     return matched_chars / total_chars if total_chars > 0 else 0.0
 
 
-# Test for strategy combinations with given input and expected output
 @pytest.mark.parametrize("input_text, expected_output", GLOBAL_TEST_CASES)
 def test_strategy_combinations(text_processor, input_text: str, expected_output: str):
     result = text_processor.process(input_text)
@@ -86,7 +81,7 @@ def test_strategy_combinations(text_processor, input_text: str, expected_output:
     )
 
 
-# Collect results and print table after all tests
+# Hook to collect the pass/fail status of tests
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_makereport(item, call):
     if call.when == "call" and call.excinfo is not None:
@@ -95,6 +90,7 @@ def pytest_runtest_makereport(item, call):
         item.user_properties.append(("test_status", "passed"))
 
 
+# Custom summary hook
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
     if not config.option.tbstyle:
         return
@@ -103,9 +99,10 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
         [r["input"], r["output"], r["expected"], f"{r['accuracy']:.2f}"]
         for r in results
     ]
+
     print("\nTest Summary:")
-    print(
-        tabulate(
-            table, headers=["Input", "Output", "Expected", "Accuracy"], tablefmt="grid"
-        )
-    )
+    t = tabulate(table, headers=["Input", "Output", "Expected", "Accuracy"], tablefmt="grid")
+    print(t)
+
+    with open("tests_summary.txt", "w") as f:
+        f.write(t)
