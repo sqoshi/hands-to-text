@@ -4,7 +4,6 @@ on:
   push:
 
 env:
-  dataprep-directory: ./dataprep
   package-directory: ./package
   POETRY_DYNAMIC_VERSIONING: true
 
@@ -24,28 +23,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: find . -type f -name Dockerfile -exec hadolint {} +
-
-  build-push-dataprep-package:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: Install poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "export PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
-          poetry self add poetry-dynamic-versioning
-      - name: Build package
-        working-directory: ${{env.dataprep-directory}}
-        run: |
-          poetry install --only main
-          poetry build
-      - name: Publish package
-        if: startsWith(github.ref, 'refs/tags/')
-        working-directory: ${{env.dataprep-directory}}
-        run: poetry publish --username __token__ --password ${{ secrets.PYPI_TOKEN }}
 
   build-push-package:
     runs-on: ubuntu-latest
@@ -89,25 +66,3 @@ jobs:
         run: |
           docker push ghcr.io/${{ github.repository }}:${{ github.ref_name }}
           docker push ghcr.io/${{ github.repository }}:latest
-  build-push-docker-dataprep:
-      permissions:
-        packages: write
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v4
-        - uses: docker/setup-buildx-action@v3
-        - uses: docker/login-action@v3
-          with:
-            registry: ghcr.io
-            username: ${{ github.actor }}
-            password: ${{ secrets.GITHUB_TOKEN }}
-        - name: Build docker image
-          working-directory: ${{env.dataprep-directory}}
-          run: |
-            docker build -t ghcr.io/sqoshi/httdataprep:$(git describe --tags --always) .
-        - name: Push docker image
-          working-directory: ${{env.dataprep-directory}}
-          if: startsWith(github.ref, 'refs/tags/')
-          run: |
-            docker push ghcr.io/sqoshi/httdataprep:${{ github.ref_name }}
-            docker push ghcr.io/sqoshi/httdataprep:latest
