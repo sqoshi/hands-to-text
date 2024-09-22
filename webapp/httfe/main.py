@@ -1,12 +1,12 @@
 from fastapi import FastAPI, Request
-from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from httfe.core.log import setup_logging
-from httfe.routes.video import router as video_router
 from httfe.routes.chat import router as chat_router
 from httfe.routes.text import router as text_router
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from httfe.routes.video import router as video_router
 
 setup_logging()
 app = FastAPI()

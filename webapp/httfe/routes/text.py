@@ -1,11 +1,13 @@
 import logging
 from typing import Annotated
+
 from fastapi import APIRouter, Depends, Query
-from httfe.schemas.text import TextResponse, TextResetResponse
-from httfe.services.text import get_text_srv, TextService
+from httfe.schemas.text import TextResetResponse, TextResponse
+from httfe.services.text import TextService, get_text_srv
 
 router = APIRouter()
 logger = logging.getLogger("httfe")
+
 
 @router.get("/", response_model=TextResponse)
 async def get_text(

@@ -1,20 +1,20 @@
 VERSION=$(or $(shell git describe --tags --always), latest)
 
-ARTIFACTORY ?= 
+ARTIFACTORY ?=
 
 .ONESHELL:
 .PHONY: run fmt prepare docker-build docker-run help
 
-run: ## Run the application
-	cd application
+run: ## Run the webapp
+	cd webapp
 	.venv/bin/python3 -m gunicorn run:app -c gunicorn.conf.py --reload
 
 fmt: ## Format the code using pre-commit
 	pre-commit run --all
 
-prepare: ## Prepare the package and application dependencies
+prepare: ## Prepare the package and webapp dependencies
 	cd ./package && poetry install && cd ..
-	cd ./application && poetry install && cd ..
+	cd ./webapp && poetry install && cd ..
 
 docker-build-httdataprep: ## Build the Docker image
 	cd dataprep
@@ -46,7 +46,7 @@ docker-run-httdataprep: ## Run the Docker container
 
 docker-run: docker-build ## Run the Docker container
 	docker run --network host --name htt --rm -it ${ARTIFACTORY}sqoshi/hands-to-text:latest
- 
+
 help: ## Print help with command name and comment for each target
 	@echo "Available targets:"
 	@awk '/^[a-zA-Z\-_0-9]+:/ { \

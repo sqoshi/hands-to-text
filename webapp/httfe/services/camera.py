@@ -1,9 +1,11 @@
-import threading
 import cv2
-from hands_to_text.video.images import draw_classbox, process_frame, read_hands_models
 from httfe.core.config import settings
 from httfe.services.text import TextService
 from httfe.services.utils import singleton
+
+from hands_to_text.video.images import draw_classbox, process_frame, read_hands_models
+
+
 @singleton
 class CameraService:
     IMG_HEAD = b"--frame\r\nContent-Type: image/jpeg\r\n\r\n"
@@ -17,7 +19,6 @@ class CameraService:
     def __init__(self):
         self.cap = cv2.VideoCapture(settings.device_id)
         self.model, self.hands = read_hands_models(settings.hands_model_path)
-        self.lock = threading.Lock()
 
     def read_frame(self):
         if self.cap is None or not self.cap.isOpened():
@@ -30,7 +31,7 @@ class CameraService:
     def start_camera(self):
         if self.cap is not None:
             self.cap.release()
-        self.cap = cv2.VideoCapture(0)
+        self.cap = cv2.VideoCapture(settings.device_id)
         return self.cap.isOpened()
 
     def stop_camera(self):
@@ -54,8 +55,7 @@ class CameraService:
 
             if chbox:
                 draw_classbox(img, chbox)
-                with self.lock:
-                    text_service.update_text(chbox.class_name)
+                text_service.update_text(chbox.class_name)
 
             ret, buffer = cv2.imencode(".jpg", img)
             if not ret:

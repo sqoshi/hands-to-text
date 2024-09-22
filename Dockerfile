@@ -5,7 +5,7 @@ ARG https_proxy
 ARG no_proxy
 
 ENV PATH="/app/.venv/bin:$PATH" \
-    HANDS_MODEL_PATH="/app/models/model.pickle" 
+    HANDS_MODEL_PATH="/app/models/model.pickle"
 
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 RUN apt-get update && apt-get install --no-install-recommends -y \
@@ -19,7 +19,7 @@ ENV PATH="/root/.local/bin:$PATH" \
 WORKDIR /app
 
 COPY /package ./package
-COPY /application ./application
+COPY /webapp ./webapp
 COPY /models ./models
 
 WORKDIR /app/package
@@ -27,17 +27,17 @@ WORKDIR /app/package
 RUN curl -sSL https://install.python-poetry.org | python3 - && \
     poetry config virtualenvs.in-project true && \
     poetry self add "poetry-dynamic-versioning[plugin]" && \
-    poetry install --only main 
+    poetry install --only main
 
-WORKDIR /app/application
+WORKDIR /app/webapp
 
-RUN poetry install --only main 
+RUN poetry install --only main
 
 FROM base AS final
-ENV PATH="/app/application/.venv/bin:/app/package/.venv/bin:$PATH"
+ENV PATH="/app/webapp/.venv/bin:/app/package/.venv/bin:$PATH"
 
 COPY --from=builder /app /app
 
-WORKDIR /app/application
+WORKDIR /app/webapp
 
-ENTRYPOINT ["gunicorn", "-c", "gunicorn.conf.py", "app:app"]
+ENTRYPOINT ["uvicorn", "main:app"]

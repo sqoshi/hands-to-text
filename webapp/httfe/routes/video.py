@@ -1,9 +1,10 @@
 from typing import Annotated
+
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import StreamingResponse
+from httfe.schemas.camera import CameraResponse
 from httfe.services.camera import CameraService, get_cam_srv
 from httfe.services.text import TextService, get_text_srv
-from httfe.schemas.camera import CameraResponse
 
 router = APIRouter()
 
