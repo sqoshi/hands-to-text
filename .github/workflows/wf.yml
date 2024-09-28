@@ -23,6 +23,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: find . -type f -name Dockerfile -exec hadolint {} +
+  test:
+    runs-on: ubuntu-latest
+    container: hadolint/hadolint:latest-debian
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "export PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
+          poetry self add poetry-dynamic-versioning
+      - run: cd package && poetry install && poetry run pytest
 
   build-push-package:
     runs-on: ubuntu-latest
