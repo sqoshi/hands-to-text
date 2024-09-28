@@ -23,9 +23,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: find . -type f -name Dockerfile -exec hadolint {} +
-  test:
+  test-package:
     runs-on: ubuntu-latest
-    container: python:3.11
     steps:
       - uses: actions/checkout@v4
       - name: Install poetry
