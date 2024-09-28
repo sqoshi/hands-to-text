@@ -6,8 +6,10 @@ ARTIFACTORY ?=
 .PHONY: run fmt prepare docker-build docker-run help
 
 run: ## Run the webapp
-	cd webapp
-	.venv/bin/python3 -m gunicorn run:app -c gunicorn.conf.py --reload
+	webapp/.venv/bin/python3  uvicorn main:app --reload
+
+test: ## Run tests
+	package/.venv/bin/python3 -m pytest package/tests
 
 fmt: ## Format the code using pre-commit
 	pre-commit run --all
@@ -15,16 +17,6 @@ fmt: ## Format the code using pre-commit
 prepare: ## Prepare the package and webapp dependencies
 	cd ./package && poetry install && cd ..
 	cd ./webapp && poetry install && cd ..
-
-docker-build-httdataprep: ## Build the Docker image
-	cd dataprep
-	docker build \
-	--build-arg http_proxy \
-	--build-arg https_proxy \
-	--build-arg no_proxy \
-	-t ${ARTIFACTORY}sqoshi/httdataprep:latest \
-	-t ${ARTIFACTORY}sqoshi/httdataprep:$(VERSION) \
-	.
 
 docker-build: ## Build the Docker image
 	docker build \
@@ -35,17 +27,14 @@ docker-build: ## Build the Docker image
 	-t ${ARTIFACTORY}sqoshi/hands-to-text:$(VERSION) \
 	.
 
-docker-run-httdataprep: ## Run the Docker container
-	docker run --rm -it \
-	--network host \
+docker-run: docker-build ## Run the Docker container
+	docker run --network host \
+	--name htt --rm -it \
 	--name httdataprep \
 	-e DISPLAY=${DISPLAY} \
 	--device /dev/video0:/dev/video0 \
 	-v /tmp/.X11-unix:/tmp/.X11-unix \
-	${ARTIFACTORY}sqoshi/httdataprep:latest
-
-docker-run: docker-build ## Run the Docker container
-	docker run --network host --name htt --rm -it ${ARTIFACTORY}sqoshi/hands-to-text:latest
+	${ARTIFACTORY}sqoshi/hands-to-text:latest
 
 help: ## Print help with command name and comment for each target
 	@echo "Available targets:"
