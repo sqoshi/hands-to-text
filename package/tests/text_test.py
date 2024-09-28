@@ -1,11 +1,12 @@
 import pytest
+from tabulate import tabulate
+
 from hands_to_text.text import TextProcessor
 from hands_to_text.text.strategy import (
     FilterContiniousSymbolsStrategy,
     LeverageLanguageModelStrategy,
     RemoveRepetitionsStrategy,
 )
-from tabulate import tabulate
 
 GLOBAL_TEST_CASES = [
     ("HHHHHEEEEEELLLLLOOOOOO", "HELLO"),
@@ -101,7 +102,9 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     ]
 
     print("\nTest Summary:")
-    t = tabulate(table, headers=["Input", "Output", "Expected", "Accuracy"], tablefmt="grid")
+    t = tabulate(
+        table, headers=["Input", "Output", "Expected", "Accuracy"], tablefmt="grid"
+    )
     print(t)
 
     with open("tests_summary.txt", "w") as f:

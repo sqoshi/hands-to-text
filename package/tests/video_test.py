@@ -1,9 +1,10 @@
 import cv2
 import pytest
+
 from hands_to_text.text import (
-    TextProcessor,
-    RemoveRepetitionsStrategy,
     LeverageLanguageModelStrategy,
+    RemoveRepetitionsStrategy,
+    TextProcessor,
 )
 from hands_to_text.video import draw_classbox, process_frame, read_hands_models
 
