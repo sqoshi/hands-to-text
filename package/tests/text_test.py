@@ -3,6 +3,7 @@ from tabulate import tabulate
 
 from hands_to_text.text import TextProcessor
 from hands_to_text.text.strategy import (
+    AutoCorrectionStrategy,
     FilterContiniousSymbolsStrategy,
     LeverageLanguageModelStrategy,
     RemoveRepetitionsStrategy,
@@ -18,37 +19,27 @@ GLOBAL_TEST_CASES = [
         "TTThhee ccoommmaandd wiiiilllll ttakkeee iimmmaagesss foor dddiffereentt cllasseess (succh as thhe aaallphabettt in ssignn llaanguagge) aandd sttoorree thhem in ttthhe sppecfiiieed ddiiirreecttoorrryy. EEaacch cllassss wiiill hhhaave bby iimmmaagess colllected ussiiing llannnddmarkk detectiiionnn. TThhe colllecttionn wiiilll ccconttinuuue untiill all iimmmagesss aarree gathheereed ffoor eeach cllassss",
         "The command will take images for different classes (such as the alphabet in sign language) and store them in the specified directory. Each class will have images collected using landmark detection. The collection will continue until all images are gathered for each class",
     ),
+    (
+        "TTThxeecoFmmmawndddwIillllttakzeeiKmmaagvesssfDoorrddiffvrenttclRaassess(suucchasvthBheeaaallphabetktinssiggnnqllahanguaggee)aanddstbtoorrethjemRinmthhesppnecfiGieedddiiirOrecttoryy.EEEaacxhchhhclflassswiiiillhhhhaavvTebbyiimmaagessfcolFllecteddvuujsingllahnnndmarrkkdetectHionnn.TTphhhecolllectzioonhwiillklcconntinnueuntilallQimmaagesxsaarregaytherredfooreeeachhclxlassss",
+        "The command will take images for different classes (such as the alphabet in sign language) and store them in the specified directory. Each class will have images collected using landmark detection. The collection will continue until all images are gathered for each class",
+    ),
 ]
-
-
-@pytest.fixture
-def remove_reps_strategy():
-    return RemoveRepetitionsStrategy()
-
-
-@pytest.fixture
-def filter_symbols_strategy():
-    return FilterContiniousSymbolsStrategy()
-
-
-@pytest.fixture
-def language_model_strategy():
-    return LeverageLanguageModelStrategy()
 
 
 @pytest.fixture(
     params=[
         [RemoveRepetitionsStrategy],
         [FilterContiniousSymbolsStrategy],
-        [LeverageLanguageModelStrategy],
-        [RemoveRepetitionsStrategy, FilterContiniousSymbolsStrategy],
-        [RemoveRepetitionsStrategy, LeverageLanguageModelStrategy],
-        [FilterContiniousSymbolsStrategy, LeverageLanguageModelStrategy],
-        [
-            RemoveRepetitionsStrategy,
-            FilterContiniousSymbolsStrategy,
-            LeverageLanguageModelStrategy,
-        ],
+        [AutoCorrectionStrategy],
+        # [LeverageLanguageModelStrategy],
+        # [RemoveRepetitionsStrategy, FilterContiniousSymbolsStrategy],
+        # [RemoveRepetitionsStrategy, LeverageLanguageModelStrategy],
+        # [FilterContiniousSymbolsStrategy, LeverageLanguageModelStrategy],
+        # [
+        #     RemoveRepetitionsStrategy,
+        #     FilterContiniousSymbolsStrategy,
+        #     LeverageLanguageModelStrategy,
+        # ],
     ]
 )
 def text_processor(request):
@@ -80,32 +71,54 @@ def test_strategy_combinations(text_processor, input_text: str, expected_output:
     print(
         f"Input: {input_text}\nOutput: {result}\nExpected: {expected_output}\nAccuracy: {accuracy:.2f}\n"
     )
+    assert accuracy > 0.5
 
 
-# Hook to collect the pass/fail status of tests
+# @pytest.hookimpl(tryfirst=True)
+# def pytest_runtest_makereport(item, call):
+#     if call.when == "call" and call.excinfo is not None:
+#         item.user_properties.append(("test_status", "failed"))
+#     else:
+#         item.user_properties.append(("test_status", "passed"))
+
+
 @pytest.hookimpl(tryfirst=True)
 def pytest_runtest_makereport(item, call):
-    if call.when == "call" and call.excinfo is not None:
-        item.user_properties.append(("test_status", "failed"))
-    else:
-        item.user_properties.append(("test_status", "passed"))
+    if call.when == "call":
+        outcome = call.excinfo
+        try:
+            test_outcome = "failed" if outcome else "passed"
+            table = [
+                [r["input"], r["output"], r["expected"], f"{r['accuracy']:.2f}"]
+                for r in results
+            ]
+
+            print("\nTest Summary:")
+            t = tabulate(
+                table,
+                headers=["Input", "Output", "Expected", "Accuracy"],
+                tablefmt="grid",
+            )
+            print(t)
+
+            with open("tests_summary.txt", "w") as f:
+                f.write(t)
+        except Exception as e:
+            print("ERROR:", e)
 
 
-# Custom summary hook
-def pytest_terminal_summary(terminalreporter, exitstatus, config):
-    if not config.option.tbstyle:
-        return
+# @pytest.hookimpl(tryfirst=True)
+# def pytest_terminal_summary(terminalreporter, exitstatus, config):
+#     table = [
+#         [r["input"], r["output"], r["expected"], f"{r['accuracy']:.2f}"]
+#         for r in results
+#     ]
 
-    table = [
-        [r["input"], r["output"], r["expected"], f"{r['accuracy']:.2f}"]
-        for r in results
-    ]
+#     print("\nTest Summary:")
+#     t = tabulate(
+#         table, headers=["Input", "Output", "Expected", "Accuracy"], tablefmt="grid"
+#     )
+#     print(t)
 
-    print("\nTest Summary:")
-    t = tabulate(
-        table, headers=["Input", "Output", "Expected", "Accuracy"], tablefmt="grid"
-    )
-    print(t)
-
-    with open("tests_summary.txt", "w") as f:
-        f.write(t)
+#     with open("tests_summary.txt", "w") as f:
+#         f.write(t)

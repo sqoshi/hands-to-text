@@ -1,4 +1,5 @@
-from transformers import pipeline
+from autocorrect import Speller
+from transformers import pipeline, set_seed
 
 from .abstract import TextProcessingStrategy
 
@@ -17,6 +18,19 @@ class RemoveRepetitionsStrategy(TextProcessingStrategy):
             if char != result[-1]:
                 result.append(char)
         return "".join(result)
+
+
+class AutoCorrectionStrategy(TextProcessingStrategy):
+    """
+    A strategy to autocorrect the text.
+    For example, "aaabbbbcc" becomes "abc".
+    """
+
+    def __init__(self):
+        self.speller = Speller("en")
+
+    def process(self, text: str) -> str:
+        return self.speller(text)
 
 
 class FilterContiniousSymbolsStrategy(TextProcessingStrategy):
@@ -48,19 +62,21 @@ class LeverageLanguageModelStrategy(TextProcessingStrategy):
     A strategy that uses a language model (like GPT-2) to correct noisy sequences.
     """
 
-    def __init__(self, model_name: str = "gpt2"):
-        self.model = pipeline("text-generation", model=model_name)
+    def __init__(self, model_name: str = "facebook/bart-large-cnn"):
+        set_seed(42)
+        # self.model = pipeline("text-generation", model="gpt3.5-turbo", token="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")
+        self.model = pipeline("text-generation", model="facebook/bart-large-cnn")
+        # self.model = pipeline("text2text-generation", model=model_name)
+        self.model = pipeline("text-generation", model="gpt2")
+        # tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-3.1-8B")
+        # model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-3.1-8B")
+        # self.model.pipeline = pipeline(
+        #     "text-generation", model="meta-llama/Meta-Llama-3.1-8B", device_map="auto", token="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"
+        # )
 
     def process(self, text: str) -> str:
-        prompt = (
-            "The following sequence of letters was collected from sign language "
-            "classification in video frames. The sequence contains repeated letters "
-            "due to frame-by-frame detection. Please correct the sequence into a valid word or phrase. "
-            "For example, 'HHHHHEEELLLLOOOO' should become 'HELLO'. Correct this sequence: "
-            f"'{text}'"
-        )
-        generated = self.model(prompt, max_length=500, num_return_sequences=1)
-        corrected_text = generated[0]["generated_text"].strip()
+        generated = self.model(f"Correct sentences: '{text}'", max_length=250)
+        corrected_text = str(generated)
         return corrected_text
 
 
