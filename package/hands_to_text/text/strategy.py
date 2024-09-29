@@ -1,7 +1,25 @@
+import itertools
+import fuzzy
+import textdistance
+import wordninja
 from autocorrect import Speller
 from transformers import pipeline, set_seed
-
+from g4f.client import Client
 from .abstract import TextProcessingStrategy
+
+
+class PhoneticCorrectionStrategy(TextProcessingStrategy):
+    """
+    A strategy that uses phonetic algorithms to correct letters based on their phonetic sound.
+    """
+
+    def __init__(self):
+        self.soundex = fuzzy.Soundex()
+
+    def process(self, text: str) -> str:
+        words = text.split()
+        corrected_words = [self.soundex(word) for word in words]
+        return " ".join(corrected_words)
 
 
 class RemoveRepetitionsStrategy(TextProcessingStrategy):
@@ -62,12 +80,14 @@ class LeverageLanguageModelStrategy(TextProcessingStrategy):
     A strategy that uses a language model (like GPT-2) to correct noisy sequences.
     """
 
-    def __init__(self, model_name: str = "facebook/bart-large-cnn"):
+    def __init__(self, model_name: str = "gpt2"):
         set_seed(42)
+        # self.model = pipeline("text-generation", model=model_name)
+        self.model = pipeline("text2text-generation", model="t5-small")  # or t5-base, t5-large
+
         # self.model = pipeline("text-generation", model="gpt3.5-turbo", token="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")
-        self.model = pipeline("text-generation", model="facebook/bart-large-cnn")
+        # self.model = pipeline("text-generation", model="facebook/bart-large-cnn")
         # self.model = pipeline("text2text-generation", model=model_name)
-        self.model = pipeline("text-generation", model="gpt2")
         # tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-3.1-8B")
         # model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-3.1-8B")
         # self.model.pipeline = pipeline(
@@ -78,6 +98,25 @@ class LeverageLanguageModelStrategy(TextProcessingStrategy):
         generated = self.model(f"Correct sentences: '{text}'", max_length=250)
         corrected_text = str(generated)
         return corrected_text
+
+
+class LevenshteinCorrectionStrategy(TextProcessingStrategy):
+    """
+    A strategy that uses Levenshtein distance to correct words.
+    """
+
+    def __init__(self, word_corpus: list):
+        self.word_corpus = word_corpus
+
+    def process(self, text: str) -> str:
+        words = text.split()
+        corrected_words = []
+        for word in words:
+            closest_word = min(
+                self.word_corpus, key=lambda w: textdistance.levenshtein(word, w)
+            )
+            corrected_words.append(closest_word)
+        return " ".join(corrected_words)
 
 
 class MajorityVoteStrategy(TextProcessingStrategy):
@@ -100,6 +139,32 @@ class MajorityVoteStrategy(TextProcessingStrategy):
             window = text[start:end]
             smoothed_text.append(max(set(window), key=window.count))
         return "".join(smoothed_text)
+
+
+class WordSegmentationStrategy(TextProcessingStrategy):
+    """
+    A strategy to split continuous text into words using word segmentation.
+    """
+
+    def process(self, text: str) -> str:
+        return " ".join(wordninja.split(text))
+
+
+class ChatG4FStartegy:
+    def __init__(self):
+        self.client = Client()
+
+    def process(self, text: str) -> str:
+        response = self.client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"Correct noised text from captured frames to readable sentence: '{text}'",
+                }
+            ],
+        )
+        return response.choices[0].message.content
 
 
 # from hmmlearn import hmm
@@ -132,3 +197,20 @@ class MajorityVoteStrategy(TextProcessingStrategy):
 #         smoothed_text = ''.join([int_to_letter[i] for i in predicted_sequence])
 
 #         return smoothed_text
+
+
+def get_all_strategies():
+    return TextProcessingStrategy.__subclasses__()
+
+
+def get_startegies_perms():
+    return [
+        list(combo)
+        for length in range(1, len(get_all_strategies()) + 1)
+        for combo in itertools.permutations(get_all_strategies(), length)
+    ]
+
+
+# if __name__ == "__main__":
+#     print(get_all_strategies())
+#     print(get_startegies_perms())

@@ -1,12 +1,12 @@
 import pytest
 from tabulate import tabulate
-
-from hands_to_text.text import TextProcessor
+from hands_to_text.text import TextProcessor, get_startegies_perms
 from hands_to_text.text.strategy import (
     AutoCorrectionStrategy,
     FilterContiniousSymbolsStrategy,
     LeverageLanguageModelStrategy,
     RemoveRepetitionsStrategy,
+    ChatG4FStartegy,
 )
 
 GLOBAL_TEST_CASES = [
@@ -26,28 +26,19 @@ GLOBAL_TEST_CASES = [
 ]
 
 
-@pytest.fixture(
-    params=[
-        [RemoveRepetitionsStrategy],
-        [FilterContiniousSymbolsStrategy],
-        [AutoCorrectionStrategy],
-        # [LeverageLanguageModelStrategy],
-        # [RemoveRepetitionsStrategy, FilterContiniousSymbolsStrategy],
-        # [RemoveRepetitionsStrategy, LeverageLanguageModelStrategy],
-        # [FilterContiniousSymbolsStrategy, LeverageLanguageModelStrategy],
-        # [
-        #     RemoveRepetitionsStrategy,
-        #     FilterContiniousSymbolsStrategy,
-        #     LeverageLanguageModelStrategy,
-        # ],
-    ]
-)
+# @pytest.fixture(
+#     params=[
+#         *[
+#             list(combo)
+#             for length in range(1, len(get_all_strategies()) + 1)
+#             for combo in itertools.permutations(get_all_strategies(), length)
+#         ]
+#     ]
+# )
+@pytest.fixture(params=[[RemoveRepetitionsStrategy], [FilterContiniousSymbolsStrategy]])
 def text_processor(request):
     strategies = [strategy() for strategy in request.param]
     return TextProcessor(strategies)
-
-
-results = []
 
 
 def accuracy_check(output: str, expected: str) -> float:
@@ -57,68 +48,21 @@ def accuracy_check(output: str, expected: str) -> float:
 
 
 @pytest.mark.parametrize("input_text, expected_output", GLOBAL_TEST_CASES)
-def test_strategy_combinations(text_processor, input_text: str, expected_output: str):
+def test_strategy_combinations(
+    text_processor, results, input_text: str, expected_output: str
+):
     result = text_processor.process(input_text)
     accuracy = accuracy_check(result, expected_output)
     results.append(
         {
+            "strategies": f"`{', '.join([str(_) for _ in text_processor.strategies])}`",
+            "accuracy": accuracy,
             "input": input_text,
             "output": result,
             "expected": expected_output,
-            "accuracy": accuracy,
         }
     )
-    print(
-        f"Input: {input_text}\nOutput: {result}\nExpected: {expected_output}\nAccuracy: {accuracy:.2f}\n"
-    )
+    # print(
+    #     f"Input: {input_text}\nOutput: {result}\nExpected: {expected_output}\nAccuracy: {accuracy:.2f}\n"
+    # )
     assert accuracy > 0.5
-
-
-# @pytest.hookimpl(tryfirst=True)
-# def pytest_runtest_makereport(item, call):
-#     if call.when == "call" and call.excinfo is not None:
-#         item.user_properties.append(("test_status", "failed"))
-#     else:
-#         item.user_properties.append(("test_status", "passed"))
-
-
-@pytest.hookimpl(tryfirst=True)
-def pytest_runtest_makereport(item, call):
-    if call.when == "call":
-        outcome = call.excinfo
-        try:
-            test_outcome = "failed" if outcome else "passed"
-            table = [
-                [r["input"], r["output"], r["expected"], f"{r['accuracy']:.2f}"]
-                for r in results
-            ]
-
-            print("\nTest Summary:")
-            t = tabulate(
-                table,
-                headers=["Input", "Output", "Expected", "Accuracy"],
-                tablefmt="grid",
-            )
-            print(t)
-
-            with open("tests_summary.txt", "w") as f:
-                f.write(t)
-        except Exception as e:
-            print("ERROR:", e)
-
-
-# @pytest.hookimpl(tryfirst=True)
-# def pytest_terminal_summary(terminalreporter, exitstatus, config):
-#     table = [
-#         [r["input"], r["output"], r["expected"], f"{r['accuracy']:.2f}"]
-#         for r in results
-#     ]
-
-#     print("\nTest Summary:")
-#     t = tabulate(
-#         table, headers=["Input", "Output", "Expected", "Accuracy"], tablefmt="grid"
-#     )
-#     print(t)
-
-#     with open("tests_summary.txt", "w") as f:
-#         f.write(t)

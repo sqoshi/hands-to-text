@@ -17,6 +17,7 @@ Python package designed to convert sign language frames from video into readable
       - [Leverage Language Model Strategy](#leverage-language-model-strategy)
   - [License](#license)
   - [Contributing](#contributing)
+  - [Experiments summary](#experiments-summary)
 
 ## Overview
 
@@ -119,3 +120,7 @@ This project is licensed under the MIT License. See the LICENSE file for details
 ## Contributing
 
 Contributions are welcome. Please open issues or submit pull requests if you have improvements or fixes.
+
+## Experiments summary
+
+![Tests Summary](./tests_summary.md)
