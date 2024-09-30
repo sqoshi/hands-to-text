@@ -1,10 +1,13 @@
 import itertools
+from typing import List
+
 import fuzzy
 import textdistance
 import wordninja
 from autocorrect import Speller
-from transformers import pipeline, set_seed
 from g4f.client import Client
+from transformers import pipeline, set_seed
+
 from .abstract import TextProcessingStrategy
 
 
@@ -14,7 +17,7 @@ class PhoneticCorrectionStrategy(TextProcessingStrategy):
     """
 
     def __init__(self):
-        self.soundex = fuzzy.Soundex()
+        self.soundex = fuzzy.Soundex(5)
 
     def process(self, text: str) -> str:
         words = text.split()
@@ -61,15 +64,17 @@ class FilterContiniousSymbolsStrategy(TextProcessingStrategy):
         filtered_string = ""
         current_symbol = None
         current_count = 0
+
         for i, symbol in enumerate(text):
             if symbol == current_symbol:
                 current_count += 1
             else:
-                if current_count >= min_reps:
+                if current_symbol and current_count < min_reps:
                     filtered_string += current_symbol * current_count
                 current_symbol = symbol
                 current_count = 1
-        if current_count >= min_reps:
+
+        if current_symbol and current_count < min_reps:
             filtered_string += current_symbol * current_count
 
         return filtered_string
@@ -81,10 +86,10 @@ class LeverageLanguageModelStrategy(TextProcessingStrategy):
     """
 
     def __init__(self, model_name: str = "gpt2"):
-        set_seed(42)
+        # set_seed(42)
         # self.model = pipeline("text-generation", model=model_name)
-        self.model = pipeline("text2text-generation", model="t5-small")  # or t5-base, t5-large
-
+        self.model = pipeline("text2text-generation", model="t5-base")
+        # self.model = pipeline("text2text-generation", model="t5-small")  # or t5-base, t5-large
         # self.model = pipeline("text-generation", model="gpt3.5-turbo", token="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")
         # self.model = pipeline("text-generation", model="facebook/bart-large-cnn")
         # self.model = pipeline("text2text-generation", model=model_name)
@@ -95,7 +100,9 @@ class LeverageLanguageModelStrategy(TextProcessingStrategy):
         # )
 
     def process(self, text: str) -> str:
-        generated = self.model(f"Correct sentences: '{text}'", max_length=250)
+        generated = self.model(
+            f"Please correct the following text: '{text}'", max_length=250
+        )
         corrected_text = str(generated)
         return corrected_text
 
@@ -105,7 +112,7 @@ class LevenshteinCorrectionStrategy(TextProcessingStrategy):
     A strategy that uses Levenshtein distance to correct words.
     """
 
-    def __init__(self, word_corpus: list):
+    def __init__(self, word_corpus: List):
         self.word_corpus = word_corpus
 
     def process(self, text: str) -> str:
@@ -150,7 +157,7 @@ class WordSegmentationStrategy(TextProcessingStrategy):
         return " ".join(wordninja.split(text))
 
 
-class ChatG4FStartegy:
+class ChatG4FStrategy(TextProcessingStrategy):
     def __init__(self):
         self.client = Client()
 
@@ -200,17 +207,14 @@ class ChatG4FStartegy:
 
 
 def get_all_strategies():
+    print(TextProcessingStrategy.__subclasses__())
     return TextProcessingStrategy.__subclasses__()
 
 
-def get_startegies_perms():
+def get_startegies_perms() -> List[List[TextProcessingStrategy]]:
+    print(get_all_strategies())
     return [
         list(combo)
         for length in range(1, len(get_all_strategies()) + 1)
         for combo in itertools.permutations(get_all_strategies(), length)
     ]
-
-
-# if __name__ == "__main__":
-#     print(get_all_strategies())
-#     print(get_startegies_perms())

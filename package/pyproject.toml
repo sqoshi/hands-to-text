@@ -21,6 +21,7 @@ wordninja = "^2.0.0"
 fuzzy = "^1.2.2"
 textdistance = "^4.6.3"
 g4f = "^0.3.2.8"
+aiohttp = "^3.10.8"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
@@ -39,7 +40,7 @@ pattern = '^v?((?P<epoch>\d+)!)?(?P<base>\d+(\.\d+)*)'
 addopts = "-vv --cov --cov-report xml --cov-report html --cov-report term-missing --junit-xml py-junit.xml"
 
 [tool.coverage.run]
-source = ["src"]
+source = ["hands_to_text"]
 
 [tool.black]
 line-length = 88

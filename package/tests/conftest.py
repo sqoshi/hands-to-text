@@ -15,7 +15,13 @@ def results():
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
     """Generate a test summary after all tests have run."""
     table = [
-        [r["strategies"], f"{r['accuracy']:.2f}", r["input"], r["output"], r["expected"]]
+        [
+            r["strategies"],
+            f"{r['accuracy']:.2f}",
+            r["input"],
+            r["output"],
+            r["expected"],
+        ]
         for r in _results
     ]
 
