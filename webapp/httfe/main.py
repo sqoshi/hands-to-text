@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from httfe.core.config import settings
 from httfe.core.log import setup_logging
 from httfe.routes.chat import router as chat_router
 from httfe.routes.text import router as text_router
@@ -35,4 +36,4 @@ async def index(request: Request):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host=settings.server.host, port=settings.server.port)

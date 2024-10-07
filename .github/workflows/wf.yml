@@ -33,7 +33,6 @@ jobs:
           echo "export PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
           poetry self add poetry-dynamic-versioning
       - run: cd package && poetry install && poetry run pytest
-
   build-push-package:
     runs-on: ubuntu-latest
     steps:

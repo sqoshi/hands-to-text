@@ -1,4 +1,4 @@
-FROM python:3.11-slim AS base
+FROM python:3.12-slim AS base
 
 ARG http_proxy
 ARG https_proxy
@@ -22,12 +22,13 @@ COPY /package ./package
 COPY /webapp ./webapp
 COPY /models ./models
 
-WORKDIR /app/package
+# WORKDIR /app/package
 
 RUN curl -sSL https://install.python-poetry.org | python3 - && \
     poetry config virtualenvs.in-project true && \
-    poetry self add "poetry-dynamic-versioning[plugin]" && \
-    poetry install --only main
+    poetry self add "poetry-dynamic-versioning[plugin]"
+    #  && \
+    # poetry install --only main
 
 WORKDIR /app/webapp
 
@@ -38,6 +39,6 @@ ENV PATH="/app/webapp/.venv/bin:/app/package/.venv/bin:$PATH"
 
 COPY --from=builder /app /app
 
-WORKDIR /app/webapp
+WORKDIR /app/webapp/httfe
 
 ENTRYPOINT ["uvicorn", "main:app"]
