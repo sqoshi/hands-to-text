@@ -65,12 +65,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: package-coverage.xml
-          path: coverage-reports
+          path: covreports
       - name: Download coverage from webapp
         uses: actions/download-artifact@v4
         with:
           name: webapp-coverage.xml
-          path: coverage-reports
+          path: covreports
       - name: Install coverage.py
         run: |
           python3 -m venv venv
@@ -79,7 +79,7 @@ jobs:
       - name: Merge coverage reports
         run: |
           source venv/bin/activate
-          coverage combine coverage-reports/coverage-package.xml coverage-reports/coverage-webapp.xml
+          coverage combine covreports/package-coverage.xml covreports/webapp-coverage.xml
           coverage report
           coverage html
       - name: Deploy to GitHub Pages
