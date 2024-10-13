@@ -1,4 +1,5 @@
 import logging
+import os
 
 import uvicorn
 from dotenv import load_dotenv
@@ -14,7 +15,9 @@ from httfe.routes.chat import router as chat_router
 from httfe.routes.text import router as text_router
 from httfe.routes.video import router as video_router
 
-load_dotenv("../.env")
+print(os.curdir)
+print(os.path.exists("../.env"))
+load_dotenv()
 
 setup_logging()
 app = FastAPI()
@@ -41,6 +44,7 @@ async def index(request: Request):
 
 
 if __name__ == "__main__":
-
-    logging.debug("config %s", settings.model_dump())
-    uvicorn.run(app, host=settings.server.host, port=settings.server.port)
+    print(os.curdir)
+    print(os.path.exists("../.env"))
+    logging.debug("config %s", settings().model_dump())
+    uvicorn.run(app, host=settings().server.host, port=settings().server.port)

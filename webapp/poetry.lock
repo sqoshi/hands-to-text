@@ -1021,7 +1021,6 @@ develop = false
 autocorrect = "^2.6.1"
 fuzzy = "^1.2.2"
 g4f = "^0.3.2.8"
-huggingface-hub = "^0.25.1"
 mediapipe = ">=0.10.15"
 numpy = "*"
 openai = "^1.51.2"
@@ -3612,4 +3611,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "71e74f28d80dc5582370123c48f25a8298c8cfe0b12ff27e413c38ac48936bc3"
+content-hash = "325e613e03b658fdca1067e92a1c627fc96d0aeca84e27dd9ebd486b51c309ef"

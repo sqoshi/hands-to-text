@@ -3,7 +3,7 @@
 name = "httfe"
 version = "0.0.0"
 authors = ["Popis <piotrpopis98@icloud.com>"]
-description = "Web application for sign language talk with caht gpt "
+description = "Web application for sign language talk with chat gpt "
 readme = "README.md"
 package-mode = true
 
@@ -17,6 +17,7 @@ pydantic-settings = "^2.5.2"
 fastapi = "^0.115.2"
 openai = "^1.51.2"
 uvicorn = "^0.31.1"
+python-dotenv = "^1.0.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
@@ -32,10 +33,10 @@ enable = true
 pattern = '^v?((?P<epoch>\d+)!)?(?P<base>\d+(\.\d+)*)'
 
 [tool.pytest.ini_options]
-addopts = "-vv --cov --cov-report xml --cov-report html --cov-report term-missing --junit-xml coverage.xml"
+addopts = "-vv --cov --cov-report xml --cov-report html --cov-report term-missing --junit-xml coverage-webapp.xml"
 
 [tool.coverage.run]
-source = ["hands_to_text"]
+source = ["httfe"]
 
 [tool.black]
 line-length = 88

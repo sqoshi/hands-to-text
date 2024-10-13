@@ -15,7 +15,6 @@ scikit-learn = ">=1.5.2"
 numpy = "*"
 transformers = "^4.45.2"
 torch = "^2.4.1"
-huggingface-hub = "^0.25.1"
 autocorrect = "^2.6.1"
 wordninja = "^2.0.0"
 fuzzy = "^1.2.2"
@@ -37,7 +36,7 @@ enable = false
 pattern = '^v?((?P<epoch>\d+)!)?(?P<base>\d+(\.\d+)*)'
 
 [tool.pytest.ini_options]
-addopts = "-vv --cov --cov-report xml --cov-report html --cov-report term-missing --junit-xml coverage.xml"
+addopts = "-vv --cov --cov-report xml --cov-report html --cov-report term-missing --junit-xml coverage-package.xml"
 
 [tool.coverage.run]
 source = ["hands_to_text"]

@@ -7,7 +7,6 @@ import openai
 import textdistance
 import wordninja
 from autocorrect import Speller
-from g4f.client import Client
 from transformers import pipeline
 
 from .abstract import TextProcessingStrategy
@@ -160,12 +159,15 @@ class WordSegmentationStrategy(TextProcessingStrategy):
 
 
 class ChatG4FStrategy(TextProcessingStrategy):
-    def __init__(self):
+    def __init__(self, model_name="gpt-3.5-turbo"):
+        from g4f.client import Client
+
         self.client = Client()
+        self.model_name = model_name
 
     def process(self, text: str) -> str:
         response = self.client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=self.model_name,
             messages=[
                 {
                     "role": "user",

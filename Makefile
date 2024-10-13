@@ -6,11 +6,11 @@ ARTIFACTORY ?=
 .PHONY: run fmt prepare docker-build docker-run help
 
 run: ## Run the webapp
-	cd webapp && poetry run uvicorn httfe.main:app --reload
+	webapp/.venv/bin/python3.12 webapp/httfe/main.py
 
 test: ## Run tests
-	cd webapp && poetry run pytest tests ; cd ..
 	cd package && poetry run pytest tests ; cd ..
+	cd webapp && poetry run pytest tests ; cd ..
 
 fmt: ## Format the code using pre-commit
 	pre-commit run --all
@@ -31,7 +31,6 @@ docker-build: ## Build the Docker image
 docker-run: docker-build ## Run the Docker container
 	docker run --network host \
 	--name htt --rm -it \
-	--name httdataprep \
 	-e DISPLAY=${DISPLAY} \
 	--device /dev/video0:/dev/video0 \
 	-v /tmp/.X11-unix:/tmp/.X11-unix \

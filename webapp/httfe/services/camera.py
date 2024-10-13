@@ -17,8 +17,8 @@ class CameraService:
         return cls._instance
 
     def __init__(self):
-        self.cap = cv2.VideoCapture(settings.device_id)
-        self.model, self.hands = read_hands_models(settings.hands_model_path)
+        self.cap = cv2.VideoCapture(settings().device_id)
+        self.model, self.hands = read_hands_models(settings().hands_model_path)
 
     def read_frame(self):
         if self.cap is None or not self.cap.isOpened():
@@ -31,7 +31,7 @@ class CameraService:
     def start_camera(self):
         if self.cap is not None:
             self.cap.release()
-        self.cap = cv2.VideoCapture(settings.device_id)
+        self.cap = cv2.VideoCapture(settings().device_id)
         return self.cap.isOpened()
 
     def stop_camera(self):

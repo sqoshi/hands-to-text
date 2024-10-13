@@ -4,8 +4,16 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class ServerSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="UVICORN_")
-    host: str = Field("0.0.0.0", description="Uvicorn server deploy host", env="HOST")
-    port: int = Field(8000, description="Uvicorn server deploy port", env="PORT")
+    host: str = Field(
+        "0.0.0.0",
+        description="Uvicorn server deploy host",
+        json_schema_extra={"env": "HOST"},
+    )
+    port: int = Field(
+        8000,
+        description="Uvicorn server deploy port",
+        json_schema_extra={"env": "PORT"},
+    )
 
 
 class HandsModelSettings(BaseSettings):
@@ -14,13 +22,15 @@ class HandsModelSettings(BaseSettings):
     path: str = Field(
         "../../models/model.pickle",
         description="Path to hands random forest model",
-        env="PATH",
+        json_schema_extra={"env": "PATH"},
     )
 
 
 class ChatGPTSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="CHATGPT_")
-    key: str = Field(..., description="Chat gpt api key", env="KEY")
+    key: str = Field(
+        ..., description="Chat gpt api key", json_schema_extra={"env": "KEY"}
+    )
 
 
 class DeviceSettings(BaseSettings):
@@ -28,11 +38,20 @@ class DeviceSettings(BaseSettings):
 
 
 class Settings(BaseSettings):
-    logging_level: str = Field("DEBUG", description="Logging level", env="LOGLEVEL")
+    logging_level: str = Field(
+        "DEBUG", description="Logging level", json_schema_extra={"env": "LOGLEVEL"}
+    )
     hands: HandsModelSettings = HandsModelSettings()
     device: DeviceSettings = DeviceSettings()
     server: ServerSettings = ServerSettings()
     chat: ChatGPTSettings = ChatGPTSettings()
 
 
-settings = Settings()
+_settings = None
+
+
+def settings() -> Settings:
+    global _settings
+    if not _settings:
+        _settings = Settings()
+    return _settings
