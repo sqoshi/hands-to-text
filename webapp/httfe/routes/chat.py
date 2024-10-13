@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
+
 from httfe.schemas.chat import ChatHistoryResponse, ChatMessage, ChatResponse
 from httfe.services.chat import ChatService, get_chat_srv
 

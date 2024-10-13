@@ -1,12 +1,12 @@
 import uuid
 
-from httfe.services.utils import singleton
-
 from hands_to_text.text import (
     MajorityVoteStrategy,
     RemoveRepetitionsStrategy,
     TextProcessor,
 )
+
+from httfe.services.utils import singleton
 
 
 @singleton

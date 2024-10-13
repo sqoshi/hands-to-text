@@ -8,8 +8,8 @@ class TextProcessor:
     def __init__(self, strategies: Optional[List[TextProcessingStrategy]] = None):
         if strategies is None:
             strategies = [
-                RemoveRepetitionsStrategy(),
                 FilterContiniousSymbolsStrategy(),
+                RemoveRepetitionsStrategy(),
             ]
         self.strategies = strategies
 

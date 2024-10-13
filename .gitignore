@@ -1,8 +1,10 @@
 **/*.jpg
-**/*pycache*
+**/*cache*
 **/.venv/
 *data/
 *data_mnist/
 **/dist
 *.xml
 **/.coverage
+**/.env
+**/htmlcov

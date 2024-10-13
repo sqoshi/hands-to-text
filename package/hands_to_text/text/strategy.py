@@ -1,12 +1,14 @@
 import itertools
+import logging
 from typing import List
 
 import fuzzy
+import openai
 import textdistance
 import wordninja
 from autocorrect import Speller
 from g4f.client import Client
-from transformers import pipeline, set_seed
+from transformers import pipeline
 
 from .abstract import TextProcessingStrategy
 
@@ -87,8 +89,8 @@ class LeverageLanguageModelStrategy(TextProcessingStrategy):
 
     def __init__(self, model_name: str = "gpt2"):
         # set_seed(42)
-        # self.model = pipeline("text-generation", model=model_name)
-        self.model = pipeline("text2text-generation", model="t5-base")
+        self.model = pipeline("text-generation", model=model_name)
+        # self.model = pipeline("text2text-generation", model="t5-base")
         # self.model = pipeline("text2text-generation", model="t5-small")  # or t5-base, t5-large
         # self.model = pipeline("text-generation", model="gpt3.5-turbo", token="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")
         # self.model = pipeline("text-generation", model="facebook/bart-large-cnn")
@@ -174,45 +176,30 @@ class ChatG4FStrategy(TextProcessingStrategy):
         return response.choices[0].message.content
 
 
-# from hmmlearn import hmm
-# class ProbabilisticSmoothingStrategy(TextProcessingStrategy):
-#     """
-#     A strategy using Hidden Markov Model (HMM) for probabilistic smoothing.
-#     """
+class ChatGPTStrategy(TextProcessingStrategy):
+    def __init__(self, api_key: str, model_name="gpt-4"):
+        openai.api_key = api_key
+        self.model_name = model_name
 
-#     def __init__(self):
-#         self.model = self._train_hmm_model()
-
-#     def _train_hmm_model(self):
-#         model = hmm.MultinomialHMM(n_components=26)
-#         # Fake training data (alphabet as sequence, needs real training)
-#         X = np.array([[i] for i in range(26)] * 10)  # Simplified
-#         model.fit(X)
-#         return model
-
-#     def process(self, text: str) -> str:
-#         # Map each character to an integer for HMM
-#         letter_to_int = {chr(i + 65): i for i in range(26)}  # A-Z
-#         int_to_letter = {i: chr(i + 65) for i in range(26)}
-
-#         int_sequence = np.array([[letter_to_int[char]] for char in text if char in letter_to_int])
-
-#         # Predict the most likely sequence
-#         logprob, predicted_sequence = self.model.decode(int_sequence, algorithm="viterbi")
-
-#         # Convert back to letters
-#         smoothed_text = ''.join([int_to_letter[i] for i in predicted_sequence])
-
-#         return smoothed_text
+    def process(self, text: str) -> str:
+        response = openai.chat.completions.create(
+            model=self.model_name,
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"Correct noised text from captured frames to readable sentence: '{text}'",
+                }
+            ],
+        )
+        logging.debug("chat response %s", response)
+        return response.choices[0].message.content
 
 
 def get_all_strategies():
-    print(TextProcessingStrategy.__subclasses__())
     return TextProcessingStrategy.__subclasses__()
 
 
 def get_startegies_perms() -> List[List[TextProcessingStrategy]]:
-    print(get_all_strategies())
     return [
         list(combo)
         for length in range(1, len(get_all_strategies()) + 1)

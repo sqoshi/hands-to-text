@@ -1,10 +1,10 @@
 import pytest
-from tabulate import tabulate
 
-from hands_to_text.text import TextProcessor, get_startegies_perms
+from hands_to_text.text import TextProcessor
 from hands_to_text.text.strategy import (
     AutoCorrectionStrategy,
     ChatG4FStrategy,
+    ChatGPTStrategy,
     FilterContiniousSymbolsStrategy,
     LevenshteinCorrectionStrategy,
     LeverageLanguageModelStrategy,
@@ -33,29 +33,8 @@ GLOBAL_TEST_CASES = [
 
 @pytest.fixture(
     params=[
-        # [
-        #     RemoveRepetitionsStrategy,
-        #     FilterContiniousSymbolsStrategy,
-        #     MajorityVoteStrategy,
-        # ],
-        # [
-        #     AutoCorrectionStrategy,
-        #     PhoneticCorrectionStrategy,
-        # ],
-        # [
-        #     LeverageLanguageModelStrategy,
-        #     WordSegmentationStrategy,
-        #     PhoneticCorrectionStrategy,
-        #     AutoCorrectionStrategy,
-        # ],
-        # [
-        #     RemoveRepetitionsStrategy,
-        #     FilterContiniousSymbolsStrategy,
-        #     LeverageLanguageModelStrategy,
-        #     WordSegmentationStrategy,
-        # ],
-        [ChatG4FStrategy],
-        [LeverageLanguageModelStrategy],
+        [RemoveRepetitionsStrategy],
+        [MajorityVoteStrategy],
     ]
 )
 def text_processor(request):

@@ -1,13 +1,26 @@
-from pydantic_settings import BaseSettings
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class ServerSettings(BaseSettings):
-    host: str = "0.0.0.0"
-    port: int = 8000
+    model_config = SettingsConfigDict(env_prefix="UVICORN_")
+    host: str = Field("0.0.0.0", description="Uvicorn server deploy host", env="HOST")
+    port: int = Field(8000, description="Uvicorn server deploy port", env="PORT")
 
 
 class HandsModelSettings(BaseSettings):
-    path: str = "../../models/model.pickle"
+    model_config = SettingsConfigDict(env_prefix="HANDS_")
+
+    path: str = Field(
+        "../../models/model.pickle",
+        description="Path to hands random forest model",
+        env="PATH",
+    )
+
+
+class ChatGPTSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="CHATGPT_")
+    key: str = Field(..., description="Chat gpt api key", env="KEY")
 
 
 class DeviceSettings(BaseSettings):
@@ -15,10 +28,11 @@ class DeviceSettings(BaseSettings):
 
 
 class Settings(BaseSettings):
-    logging_level: str = "DEBUG"
+    logging_level: str = Field("DEBUG", description="Logging level", env="LOGLEVEL")
     hands: HandsModelSettings = HandsModelSettings()
     device: DeviceSettings = DeviceSettings()
     server: ServerSettings = ServerSettings()
+    chat: ChatGPTSettings = ChatGPTSettings()
 
 
 settings = Settings()

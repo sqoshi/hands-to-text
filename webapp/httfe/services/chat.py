@@ -1,7 +1,13 @@
 import asyncio
+import logging
 
+import openai
 from g4f.client import Client
+
+from httfe.core.config import settings
 from httfe.services.utils import singleton
+
+openai.api_key = settings.chat.key
 
 
 @singleton
@@ -19,21 +25,21 @@ class ChatService:
 
     async def send_chat(self, text):
         self.history.append(f"You: {text}")
-        print("chat sending..")
-        # response = self.client.chat.completions.create(
+        logging.debug("chat sending..")
+
         response = await asyncio.to_thread(
-            self.client.chat.completions.create(  # Runs in separate thread
+            openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {
                         "role": "user",
-                        "content": f"Correct noiced text from captured from frames to readable sentence and answear: {text}",
+                        "content": f"Correct noticed text from captured frames to readable sentence and answer: {text}",
                     }
                 ],
             )
         )
-        print("chat response", response)
-        assistant_response = response.choices[0].message.content
+        logging.debug("chat response %s", response)
+        assistant_response = response.choices[0].message["content"]
         self.history.append(f"Assistant: {assistant_response}")
 
     def get_history(self):

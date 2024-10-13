@@ -1,9 +1,9 @@
 import cv2
+from hands_to_text.video.images import draw_classbox, process_frame, read_hands_models
+
 from httfe.core.config import settings
 from httfe.services.text import TextService
 from httfe.services.utils import singleton
-
-from hands_to_text.video.images import draw_classbox, process_frame, read_hands_models
 
 
 @singleton

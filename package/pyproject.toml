@@ -1,0 +1,66 @@
+
+[tool.poetry]
+name = "hands-to-text"
+version = "0.0.0"
+authors = ["Popis <piotrpopis98@icloud.com>"]
+description = ""
+readme = "README.md"
+package-mode = true
+
+[tool.poetry.dependencies]
+python = "^3.10"
+opencv-python = ">=4.10.0.84"
+mediapipe = ">=0.10.15"
+scikit-learn = ">=1.5.2"
+numpy = "*"
+transformers = "^4.45.2"
+torch = "^2.4.1"
+huggingface-hub = "^0.25.1"
+autocorrect = "^2.6.1"
+wordninja = "^2.0.0"
+fuzzy = "^1.2.2"
+textdistance = "^4.6.3"
+g4f = "^0.3.2.8"
+openai = "^1.51.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+pytest-cov = "^5.0.0"
+tabulate = "^0.9.0"
+
+[build-system]
+requires = ["poetry-core", "poetry-dynamic-versioning"]
+build-backend = "poetry_dynamic_versioning.backend"
+
+[tool.poetry-dynamic-versioning]
+enable = false
+pattern = '^v?((?P<epoch>\d+)!)?(?P<base>\d+(\.\d+)*)'
+
+[tool.pytest.ini_options]
+addopts = "-vv --cov --cov-report xml --cov-report html --cov-report term-missing --junit-xml coverage.xml"
+
+[tool.coverage.run]
+source = ["hands_to_text"]
+
+[tool.black]
+line-length = 88
+
+[tool.flake8]
+max-line-length = 88
+per-file-ignores = "__init__.py:F401"
+ignore = ["E501"]
+exclude = ["tests/*", "test_*.py", "*/test_*"]
+
+[tool.isort]
+atomic = true
+profile = "black"
+line_length = 88
+skip_gitignore = true
+known_first_party = ["black"]
+
+[tool.bandit]
+skips = ["B403", "B301"]
+
+[[tool.poetry.source]]
+name = "PyPI"
+priority = "primary"
