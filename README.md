@@ -2,7 +2,7 @@
 
 ## Python Package
 
-![img](https://github.com/sqoshi/hands-to-text/blob/master/package/README.md)
+[dir](package/README.md)
 
 
 ## Web Application
