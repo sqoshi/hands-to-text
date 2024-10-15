@@ -1,4 +1,3 @@
-import logging
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
@@ -14,7 +13,6 @@ async def get_text(
     text_service: Annotated[TextService, Depends(get_text_srv)],
     corrected: bool = Query(False),
 ):
-    logging.info(f"TextService ID: {text_service.myid}")
     text = text_service.process_text() if corrected else text_service.recognized_text
     return TextResponse(text=text)
 

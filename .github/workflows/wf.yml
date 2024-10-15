@@ -71,28 +71,28 @@ jobs:
         with:
           name: .coverage-webapp
           path: covreports
-      - name: Install coverage.py
-        run: |
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install coverage
-      - name: Merge coverage reports
-        run: |
-          source venv/bin/activate
-          coverage combine covreports/.coverage-package covreports/.coverage-webapp
-          coverage report
-          coverage html
-      - name: Deploy to GitHub Pages
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin
-          git worktree add --prefix=htmlcov gh-pages
-          rsync -av --delete htmlcov/ htmlcov/
-          cd htmlcov
-          git add --all
-          git commit -m "Deploy coverage report to GitHub Pages"
-          git push origin gh-pages
+      # - name: Install coverage.py
+      #   run: |
+      #     python3 -m venv venv
+      #     source venv/bin/activate
+      #     pip install coverage
+      # - name: Merge coverage reports
+      #   run: |
+      #     source venv/bin/activate
+      #     coverage combine covreports/.coverage-package covreports/.coverage-webapp
+      #     coverage report
+      #     coverage html
+      # - name: Deploy to GitHub Pages
+      #   run: |
+      #     git config --global user.name "github-actions[bot]"
+      #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      #     git fetch origin
+      #     git worktree add --prefix=htmlcov gh-pages
+      #     rsync -av --delete htmlcov/ htmlcov/
+      #     cd htmlcov
+      #     git add --all
+      #     git commit -m "Deploy coverage report to GitHub Pages"
+      #     git push origin gh-pages
 
   build-push-package:
     runs-on: ubuntu-latest

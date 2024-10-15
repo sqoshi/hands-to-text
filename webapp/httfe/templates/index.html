@@ -13,9 +13,10 @@
           <img id="video" alt="video" />
         </div>
         <div class="button-container">
-          <button class="btn" onclick="manageCamera('stop')">Stop Camera</button>
           <button class="btn" onclick="manageCamera('start')">Start Camera</button>
+          <button class="btn" onclick="manageCamera('stop')">Stop Camera</button>
           <button class="btn" onclick="resetText()">Reset Text</button>
+          <button class="btn" onclick="correctText()">Correct Text</button>
           <button class="btn" onclick="sendChat()">Send Chat</button>
         </div>
       </div>
@@ -28,9 +29,8 @@
 
     <script>
       let textUpdateInterval;
-      let textCorrectedUpdateInterval;
 
-      function updateTextCorrected() {
+      function correctText() {
         fetch("/text/?corrected=true")
           .then((response) => response.json())
           .then((data) => {
@@ -79,7 +79,7 @@
         fetch("/chat/", {
           method: "POST",
           headers: {
-            "Content-Type": "webapp/json",
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({ text: text }),
         })
@@ -105,12 +105,10 @@
         updateText();
         updateTextCorrected();
         textUpdateInterval = setInterval(updateText, 2000); // Update text every 2 seconds
-        textCorrectedUpdateInterval = setInterval(updateTextCorrected, 2000); // Update corrected text every 2 seconds
       }
 
       function stopAutoUpdates() {
         clearInterval(textUpdateInterval);
-        clearInterval(textCorrectedUpdateInterval);
       }
 
       // Initialize auto updates when the page loads

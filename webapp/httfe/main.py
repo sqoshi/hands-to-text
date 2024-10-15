@@ -2,7 +2,6 @@ import logging
 import os
 
 import uvicorn
-from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
@@ -15,11 +14,6 @@ from httfe.routes.chat import router as chat_router
 from httfe.routes.text import router as text_router
 from httfe.routes.video import router as video_router
 
-print(os.curdir)
-print(os.path.exists("../.env"))
-load_dotenv()
-
-setup_logging()
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -29,13 +23,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(video_router, prefix="/video", tags=["video"])
+app.include_router(chat_router, prefix="/chat", tags=["chat"])
+app.include_router(text_router, prefix="/text", tags=["text"])
 
-app.include_router(video_router, prefix="/video", tags="video")
-app.include_router(chat_router, prefix="/chat", tags="chat")
-app.include_router(text_router, prefix="/text", tags="text")
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+cdir = os.path.dirname(os.path.abspath(__file__))
+app.mount("/static", StaticFiles(directory=os.path.join(cdir, "static")), name="static")
+templates = Jinja2Templates(directory=os.path.join(cdir, "templates"))
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -44,7 +39,8 @@ async def index(request: Request):
 
 
 if __name__ == "__main__":
-    print(os.curdir)
-    print(os.path.exists("../.env"))
-    logging.debug("config %s", settings().model_dump())
+    c = settings().model_dump()
+    setup_logging()
+    logging.debug("config %s", c)
+
     uvicorn.run(app, host=settings().server.host, port=settings().server.port)

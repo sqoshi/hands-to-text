@@ -9,6 +9,7 @@ run: ## Run the webapp
 	webapp/.venv/bin/python3.12 webapp/httfe/main.py
 
 test: ## Run tests
+	export CHATGPT_KEY=11111111
 	cd package && poetry run pytest tests ; cd ..
 	cd webapp && poetry run pytest tests ; cd ..
 

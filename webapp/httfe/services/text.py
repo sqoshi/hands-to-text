@@ -1,20 +1,17 @@
-import uuid
+from hands_to_text.text import TextProcessor
+from hands_to_text.text.strategy import ChatGPTStrategy
 
-from hands_to_text.text import (
-    MajorityVoteStrategy,
-    RemoveRepetitionsStrategy,
-    TextProcessor,
-)
-
+from httfe.core.config import settings
 from httfe.services.utils import singleton
 
 
 @singleton
 class TextService:
     def __init__(self):
-        self.myid = uuid.uuid4()
         self.processor = TextProcessor(
-            strategies=[RemoveRepetitionsStrategy(), MajorityVoteStrategy()]
+            strategies=[
+                ChatGPTStrategy(api_key=settings().chat.key),
+            ]
         )
         self.recognized_text = ""
 

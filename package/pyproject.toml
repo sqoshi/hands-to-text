@@ -11,7 +11,7 @@ package-mode = true
 python = "^3.10"
 opencv-python = ">=4.10.0.84"
 mediapipe = ">=0.10.15"
-scikit-learn = ">=1.5.2"
+scikit-learn = "1.5.1"
 numpy = "*"
 transformers = "^4.45.2"
 torch = "^2.4.1"

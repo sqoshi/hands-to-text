@@ -1,5 +1,8 @@
+from dotenv import load_dotenv
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+load_dotenv()
 
 
 class ServerSettings(BaseSettings):
@@ -20,7 +23,7 @@ class HandsModelSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="HANDS_")
 
     path: str = Field(
-        "../../models/model.pickle",
+        "models/model.pickle",
         description="Path to hands random forest model",
         json_schema_extra={"env": "PATH"},
     )
@@ -34,7 +37,9 @@ class ChatGPTSettings(BaseSettings):
 
 
 class DeviceSettings(BaseSettings):
-    idx: int = 0
+    model_config = SettingsConfigDict(env_prefix="DEVICE_")
+
+    idx: int = Field(0, description="Camera device id", json_schema_extra={"env": "ID"})
 
 
 class Settings(BaseSettings):

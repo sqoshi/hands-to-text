@@ -16,10 +16,10 @@ class ChatService:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __init__(self, model_name="gpt-4.0"):
+    def __init__(self):
         openai.api_key = settings().chat.key
         self.history = []
-        self.model_name = model_name
+        self.model_name = "gpt-4.0"
 
     async def send_chat(self, text):
         self.history.append(f"You: {text}")

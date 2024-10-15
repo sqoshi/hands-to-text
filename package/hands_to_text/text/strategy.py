@@ -179,22 +179,31 @@ class ChatG4FStrategy(TextProcessingStrategy):
 
 
 class ChatGPTStrategy(TextProcessingStrategy):
-    def __init__(self, api_key: str, model_name="gpt-4"):
+    def __init__(self, api_key: str, model_name="gpt-4o"):
+        self.client = openai.Client(api_key=api_key)
         openai.api_key = api_key
         self.model_name = model_name
+        self.last_input = None
+        self.last_response = None
 
     def process(self, text: str) -> str:
-        response = openai.chat.completions.create(
+        if not text.strip():
+            return ""
+        if self.last_input == text:
+            return self.last_response.choices[0].message.content
+        self.last_input = text
+
+        self.last_response = self.client.chat.completions.create(
             model=self.model_name,
             messages=[
                 {
                     "role": "user",
-                    "content": f"Correct noised text from captured frames to readable sentence: '{text}'",
+                    "content": f"Correct noiced text collected from ASL classification and return only the corrected sequence: {text}",
                 }
             ],
         )
-        logging.debug("chat response %s", response)
-        return response.choices[0].message.content
+        logging.debug("chat response %s", self.last_response)
+        return self.last_response.choices[0].message.content
 
 
 def get_all_strategies():
