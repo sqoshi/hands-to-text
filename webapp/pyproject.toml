@@ -1,22 +1,28 @@
 
 [tool.poetry]
-name = "htt-fe"
+name = "httfe"
 version = "0.0.0"
 authors = ["Popis <piotrpopis98@icloud.com>"]
-description = ""
+description = "Web application for sign language talk with chat gpt "
 readme = "README.md"
+package-mode = true
 
 [tool.poetry.dependencies]
 python = "^3.10"
-flask = "^3.0.3"
-flask-cors = "^4.0.1"
 opencv-python = ">=4.10.0.84"
-gunicorn = "^22.0.0"
-g4f = {extras = ["all"], version = "^0.3.2.3"}
-hands-to-text = {path = "../package"}
+mediapipe = ">=0.10.15"
+hands-to-text = { path = "../package" }
+pydantic = "^2.9.2"
+pydantic-settings = "^2.5.2"
+fastapi = "^0.115.2"
+openai = "^1.51.2"
+uvicorn = "^0.31.1"
+python-dotenv = "^1.0.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
+pytest-cov = "^5.0.0"
+tabulate = "^0.9.0"
 
 [build-system]
 requires = ["poetry-core", "poetry-dynamic-versioning"]
@@ -27,10 +33,10 @@ enable = true
 pattern = '^v?((?P<epoch>\d+)!)?(?P<base>\d+(\.\d+)*)'
 
 [tool.pytest.ini_options]
-addopts = "--cov --cov-report xml --cov-report html --cov-report term-missing --junit-xml py-junit.xml"
+addopts = "-vv --cov --cov-report xml --cov-report html --cov-report term-missing --junit-xml coverage-webapp.xml"
 
 [tool.coverage.run]
-source = ["src"]
+source = ["httfe"]
 
 [tool.black]
 line-length = 88
@@ -38,7 +44,8 @@ line-length = 88
 [tool.flake8]
 max-line-length = 88
 per-file-ignores = "__init__.py:F401"
-ignore = []
+ignore = ["E501"]
+exclude = ["tests/*", "test_*.py", "*/test_*"]
 
 [tool.isort]
 atomic = true

@@ -4,43 +4,103 @@ on:
   push:
 
 env:
-  app-directory: ./application
   package-directory: ./package
   POETRY_DYNAMIC_VERSIONING: true
 
 jobs:
-  # lint-tests:
-  #   name: Test Python App
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-python@v5
-  #       with:
-  #         python-version: "3.11"
-  #     - name: Install Poetry
-  #       run: |
-  #         curl -sSL https://install.python-poetry.org | python3 -
-  #         echo "export PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
-  #         poetry self add poetry-dynamic-versioning
-  #         echo "export POETRY_DYNAMIC_VERSIONING=true" >> $GITHUB_ENV
-  #     - name: Install dependencies
-  #       working-directory: package/
-  #       run: poetry install
-  #     - name: Run tests
-  #       working-directory: package/
-  #       run: poetry run pytest
-  #     - name: Run Lint
-  #       run: poetry run pytest
-
-  publish-python-package:
-    name: Publish Python Package
+  pre-commit:
     runs-on: ubuntu-latest
-    # needs: test-python-app
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
+      - run: pip install pre-commit
+      - run: pre-commit run --all-files
+  hadolint:
+    runs-on: ubuntu-latest
+    container: hadolint/hadolint:latest-debian
+    steps:
+      - uses: actions/checkout@v4
+      - run: find . -type f -name Dockerfile -exec hadolint {} +
+  test-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "export PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
+          poetry self add poetry-dynamic-versioning
+      - run: |
+          poetry install
+          CHATGPT_KEY=fake poetry run pytest
+        working-directory: package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: .coverage-package
+          path: package/.coverage
+  test-webapp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "export PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
+          poetry self add poetry-dynamic-versioning
+      - run: |
+          poetry install
+          CHATGPT_KEY=fake poetry run pytest
+        working-directory: webapp
+      - uses: actions/upload-artifact@v4
+        with:
+          name: .coverage-webapp
+          path: webapp/.coverage
+  merge-coverage:
+    runs-on: ubuntu-latest
+    needs: [test-package, test-webapp]
+    steps:
+      - name: Download coverage from package
+        uses: actions/download-artifact@v4
+        with:
+          name: .coverage-package
+          path: covreports
+      - name: Download coverage from webapp
+        uses: actions/download-artifact@v4
+        with:
+          name: .coverage-webapp
+          path: covreports
+      # - name: Install coverage.py
+      #   run: |
+      #     python3 -m venv venv
+      #     source venv/bin/activate
+      #     pip install coverage
+      # - name: Merge coverage reports
+      #   run: |
+      #     source venv/bin/activate
+      #     coverage combine covreports/.coverage-package covreports/.coverage-webapp
+      #     coverage report
+      #     coverage html
+      # - name: Deploy to GitHub Pages
+      #   run: |
+      #     git config --global user.name "github-actions[bot]"
+      #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      #     git fetch origin
+      #     git worktree add --prefix=htmlcov gh-pages
+      #     rsync -av --delete htmlcov/ htmlcov/
+      #     cd htmlcov
+      #     git add --all
+      #     git commit -m "Deploy coverage report to GitHub Pages"
+      #     git push origin gh-pages
+
+  build-push-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - name: Install poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
@@ -51,20 +111,15 @@ jobs:
         run: |
           poetry install --only main
           poetry build
-      - uses: actions/upload-artifact@v4
-        with:
-          name: built-package
-          path: ${{ env.package-directory }}/dist/*.whl
       - name: Publish package
         if: startsWith(github.ref, 'refs/tags/')
         working-directory: ${{env.package-directory}}
         run: poetry publish --username __token__ --password ${{ secrets.PYPI_TOKEN }}
 
-  build-and-push-docker:
-    permissions: write-all
-    name: Build and Push Docker Image
+  build-push-docker:
+    permissions:
+      packages: write
     runs-on: ubuntu-latest
-    needs: publish-python-package
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
@@ -73,15 +128,11 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/download-artifact@v4
-        with:
-          name: built-package
-          path: ${{ env.app-directory }}/dist
       - name: Build docker image
-        working-directory: ${{ env.app-directory }}
         run: |
           docker build -t ghcr.io/${{ github.repository }}:$(git describe --tags --always) .
       - name: Push docker image
-        working-directory: ${{ env.app-directory }}
         if: startsWith(github.ref, 'refs/tags/')
-        run: docker push ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+        run: |
+          docker push ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+          docker push ghcr.io/${{ github.repository }}:latest

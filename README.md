@@ -1,11 +1,11 @@
+# hands-to-text
+
+## Python Package
+
+![img](https://github.com/sqoshi/hands-to-text/raw/master/package/README.md)
 
 
+## Web Application
 
 
-## Progress
-
-
-# Week I ( -x)
-- added possibility to test model on real videos
-- found data for tests
-- created startegies
+![img](https://github.com/sqoshi/hands-to-text/raw/master/webapp/README.md)
