@@ -2,11 +2,9 @@
 
 ## Python Package
 
-[dir](package/README.md)
-
-{{md  .. package/README.md }}
+![img](https://github.com/sqoshi/hands-to-text/blob/master/package/README.md)
+[package](package/README.md)
 
 ## Web Application
 
-
-![img](https://github.com/sqoshi/hands-to-text/raw/master/webapp/README.md)
+[webapp](https://github.com/sqoshi/hands-to-text/blob/master/webapp/README.md)
