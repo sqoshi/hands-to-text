@@ -4,6 +4,7 @@
 
 [dir](package/README.md)
 
+{% include_relative package/README.md %}
 
 ## Web Application
 
