@@ -4,14 +4,18 @@
 
 ## Introduction
 
+This tool has been created for people that using ASL
 
 
 ## Usage
 
+It is required to generate openapikey from [page](https://platform.openai.com/).
+
 ```shellscript
-    make run
+    docker run -e CHATGPT_KEY=<key>
 ```
 
+0. Open localhost:8000
 1. Start Camera
 2. Use ASL to write sentence
 3. Stop Camera

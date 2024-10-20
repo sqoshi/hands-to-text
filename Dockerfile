@@ -1,5 +1,6 @@
-FROM python:3.12-slim AS base
 FROM ghcr.io/sqoshi/htt-models:0.0.0 AS models
+
+FROM python:3.12-slim AS base
 
 ARG http_proxy
 ARG https_proxy
