@@ -1,11 +1,12 @@
 FROM python:3.12-slim AS base
+FROM ghcr.io/htt-models:0.0.0 AS models
 
 ARG http_proxy
 ARG https_proxy
 ARG no_proxy
 
 ENV PATH="/app/.venv/bin:$PATH" \
-    HANDS_MODEL_PATH="/app/models/model.pickle"
+    HANDS_PATH="/models/rf.pickle"
 
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 RUN apt-get update && apt-get install --no-install-recommends -y \
@@ -20,7 +21,7 @@ WORKDIR /app
 
 COPY /package ./package
 COPY /webapp ./webapp
-COPY /models ./models
+COPY --from=models /models ./models
 
 # WORKDIR /app/package
 
