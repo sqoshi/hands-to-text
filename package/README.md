@@ -16,9 +16,8 @@ Python package designed to convert sign language frames from video into readable
       - [Remove Repetitions Strategy](#remove-repetitions-strategy)
       - [Filter Continuous Symbols Strategy](#filter-continuous-symbols-strategy)
       - [Leverage Language Model Strategy](#leverage-language-model-strategy)
-  - [License](#license)
-  - [Contributing](#contributing)
   - [Experiments summary](#experiments-summary)
+  - [Technologies](#technologies)
 
 ## Introduction
 
@@ -127,14 +126,11 @@ Uses a language model to correct noisy sequences. Example:
 "HHHHHEEELLLLOOOO" -> "HELLO"
 ```
 
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-
-## Contributing
-
-Contributions are welcome. Please open issues or submit pull requests if you have improvements or fixes.
 
 ## Experiments summary
 
 ![Tests Summary](./experiments.md)
+
+## Technologies
+
+Tool has been created as a `python` package that offers a models Services for processing images and text correction from ASL sequences, there are many of startegies. Due to the fact package is also designed for automated experimenting its maybe heavy. For handling `keras` models `scikit-learn` has been used, for handling `pytorch` models the `torch` package has been used. Other packages like `transformers`, `autocorrect`, `wordninja`, `fuzzy` has been used for experimienting on test correction. `openai` package has been used for communication with `chatgpt`. `numpy` and `opencv-python` has been used for processing images into model-readable formats. Models allow for processing videos and images, and also raw text with mayn many strategies. It is allowed to build pipelines out of text processing strategies. Tool also allow automated experiments for what `pytest` fixtures and `tabulate` has been used.

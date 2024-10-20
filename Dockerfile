@@ -7,7 +7,7 @@ ARG https_proxy
 ARG no_proxy
 
 ENV PATH="/app/.venv/bin:$PATH" \
-    HANDS_PATH="/models/rf.pickle"
+    HANDS_PATH=/app/models/rf.pickle
 
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 RUN apt-get update && apt-get install --no-install-recommends -y \

@@ -8,16 +8,21 @@ from hands_to_text.text.strategy import ChatGPTStrategy
 from hands_to_text.video import CNNModelService, RandomForestModelService
 from hands_to_text.video.processor import FramesProcessor
 
+GLOBAL_TEST_CASES = [
+    # ("examples/iloveyou.mp4", "I LOVE YOU"),
+    ("examples/drawcat.mp4", "DRAW CAT"),
+    ("examples/howareyou.mp4", "HOW ARE YOU"),
+    ("examples/whattheweather.mp4", "WHAT THE WEATHER"),
+]
+
 
 @pytest.fixture()
-def rf_setup():
+def text_processor():
     """Fixture to set up the RandomForest model service."""
-    model_path = "/home/piotr/Workspaces/studies/htt-models/models/rf.pickle"
-    rf_model_service = RandomForestModelService(path=model_path)
-    vtext_processor = TextProcessor(
+    text_processor = TextProcessor(
         strategies=[ChatGPTStrategy(api_key=os.getenv("CHATGPT_KEY"))]
     )
-    return rf_model_service, vtext_processor
+    return text_processor
 
 
 def process_video_with_frames_processor(video_path, frames_processor) -> str:
@@ -27,34 +32,44 @@ def process_video_with_frames_processor(video_path, frames_processor) -> str:
     return frames_processor.process_video(video_path)
 
 
-@pytest.mark.parametrize(
-    "video_path, expected_text",
-    [
-        # ("examples/iloveyou.mp4", "I LOVE YOU"),
-        ("examples/drawcat.mp4", "DRAW CAT"),
-        ("examples/howareyou.mp4", "How ARE YOU"),
-        ("examples/whattheweather.mp4", "WHAT THE WEATHER"),
-    ],
+@pytest.fixture(
+    params=[
+        (
+            RandomForestModelService,
+            "/home/piotr/Workspaces/studies/htt-models/models/rf.pickle",
+        ),
+        (CNNModelService, "/home/piotr/Workspaces/studies/htt-models/models/cnn.pth"),
+    ]
 )
-def test_random_forest_video_processing(
-    video_path, expected_text, rf_setup, vid_results
+def model_service(request):
+    model_class, model_path = request.param
+    return model_class(path=model_path)
+
+
+@pytest.mark.parametrize("video_path, expected_output", GLOBAL_TEST_CASES)
+def test_video_processing_with_models(
+    model_service, text_processor, vid_results, video_path: str, expected_output: str
 ):
-    """Test case for RandomForestModelService using FramesProcessor."""
-    rf_model_service, vtext_processor = rf_setup
-    frames_processor = FramesProcessor(model_service=rf_model_service)
+
+    frames_processor = FramesProcessor(model_service=model_service)
+
+    video_path_full = os.path.join(os.path.dirname(__file__), video_path)
+    assert os.path.exists(video_path_full) is True
     start = datetime.datetime.now()
-    recognized_text = process_video_with_frames_processor(video_path, frames_processor)
+    recognized_text = frames_processor.process_video(video_path_full)
     delta = datetime.datetime.now() - start
-    processed_text = vtext_processor.process(recognized_text)
+
+    processed_text = text_processor.process(recognized_text)
     vid_results.append(
         {
             "video_path": video_path,
             "processing_time": delta,
-            "strategies": f"`{', '.join([str(_) for _ in vtext_processor.strategies])}`",
-            "model": rf_model_service.__class__.__name__,
+            "strategies": f"`{', '.join([str(_) for _ in text_processor.strategies])}`",
+            "model": model_service.__class__.__name__,
             "recognized_text": recognized_text,
             "output": processed_text,
-            "expected": expected_text,
+            "expected": expected_output,
         }
     )
-    assert processed_text == expected_text
+
+    assert processed_text == expected_output

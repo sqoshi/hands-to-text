@@ -21,9 +21,39 @@ class PhoneticCorrectionStrategy(TextProcessingStrategy):
         self.soundex = fuzzy.Soundex(5)
 
     def process(self, text: str) -> str:
-        words = text.split()
-        corrected_words = [self.soundex(word) for word in words]
-        return " ".join(corrected_words)
+        try:
+            words = text.split()
+            corrected_words = [self.soundex(word) for word in words]
+            return " ".join(corrected_words)
+        except Exception:
+            return text
+
+
+class KeepRepeatedSymbolsStrategy(TextProcessingStrategy):
+    """
+    A strategy to remove symbols that do not repeat continuously for
+    a specified number of times (N).
+    Only symbols that repeat N or more times will be kept.
+    """
+
+    def process(self, text: str, min_reps: int = 3) -> str:
+        result = ""
+        current_symbol = None
+        current_count = 0
+
+        for symbol in text:
+            if symbol == current_symbol:
+                current_count += 1
+            else:
+                if current_count >= min_reps:
+                    result += current_symbol * current_count
+                current_symbol = symbol
+                current_count = 1
+
+        if current_symbol and current_count >= min_reps:
+            result += current_symbol * current_count
+
+        return result
 
 
 class RemoveRepetitionsStrategy(TextProcessingStrategy):

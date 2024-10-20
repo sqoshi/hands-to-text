@@ -1,3 +1,4 @@
+import datetime
 import os
 
 import pytest
@@ -6,6 +7,7 @@ from hands_to_text.text import TextProcessor
 from hands_to_text.text.strategy import (
     AutoCorrectionStrategy,
     ChatGPTStrategy,
+    KeepRepeatedSymbolsStrategy,
     LevenshteinCorrectionStrategy,
     MajorityVoteStrategy,
     PhoneticCorrectionStrategy,
@@ -36,7 +38,7 @@ GLOBAL_TEST_CASES = [
     params=[
         [RemoveRepetitionsStrategy, AutoCorrectionStrategy, ChatGPTStrategy],
         [PhoneticCorrectionStrategy, MajorityVoteStrategy, ChatGPTStrategy],
-        # [WordSegmentationStrategy, LevenshteinCorrectionStrategy, ChatGPTStrategy],
+        [KeepRepeatedSymbolsStrategy, RemoveRepetitionsStrategy, ChatGPTStrategy],
         [ChatGPTStrategy],
     ]
 )
@@ -62,11 +64,14 @@ def accuracy_check(output: str, expected: str) -> float:
 def test_strategy_combinations(
     text_processor, text_results, input_text: str, expected_output: str
 ):
+    start = datetime.datetime.now()
     result = text_processor.process(input_text)
+    delta = datetime.datetime.now() - start
     accuracy = accuracy_check(result, expected_output)
     text_results.append(
         {
             "strategies": f"`{', '.join([str(_) for _ in text_processor.strategies])}`",
+            "processing_time": delta,
             "accuracy": accuracy,
             "input": input_text,
             "output": result,

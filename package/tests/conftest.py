@@ -23,10 +23,11 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     """Generate a test summary after all tests have run."""
     text_table = [
         [
+            r["processing_time"],
             r["strategies"],
             f"{r['accuracy']:.2f}",
-            r["input"],
             r["output"],
+            r["input"],
             r["expected"],
         ]
         for r in _text_results
@@ -34,7 +35,14 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
 
     tt = tabulate(
         text_table,
-        headers=["Stategies", "Accuracy", "Input", "Output", "Expected"],
+        headers=[
+            "Processing Time",
+            "Text Correction Stategies",
+            "Accuracy",
+            "Output",
+            "Input",
+            "Expected",
+        ],
         tablefmt="github",
     )
 
@@ -55,9 +63,9 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
         vid_table,
         headers=[
             "Processing Time",
-            "Video_Path",
+            "Video Path",
             "Classification Model",
-            "Text Stategies",
+            "Text Correction Stategies",
             "Recognized Text",
             "Final Corrected Text",
             "Expected",
@@ -66,4 +74,4 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     )
 
     with open("experiments.md", "w") as f:
-        f.write(f"# Experiments\n\n\n ## Text \n\n{tt}\n\n\n ## Video \n\n{tv}\n\n\n")
+        f.write(f"# Experiments\n\n\n## Text\n\n{tt}\n\n\n## Video\n\n{tv}\n\n\n")
