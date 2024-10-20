@@ -6,6 +6,7 @@ Python package designed to convert sign language frames from video into readable
 
 - [hands-to-text - package](#hands-to-text---package)
   - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
   - [Overview](#overview)
     - [Processing Video Frames](#processing-video-frames)
       - [Code Example](#code-example)
@@ -18,6 +19,19 @@ Python package designed to convert sign language frames from video into readable
   - [License](#license)
   - [Contributing](#contributing)
   - [Experiments summary](#experiments-summary)
+
+## Introduction
+
+Hands-to-text package has been created for experimenting. There are 2 main problems, that this repo is responsible for.
+
+1. Letter classification from video frames with either RandomForest or LeNet CNN,
+2. Text correction with many Strategies, including AI correction with ChatGPT, other are rather treated as preprocessing for Strategies.
+
+So as stated, we selecting the model which we want to use and which strategy pipeliene we want to use, for example
+
+```text
+  video -split to frames-> Model(RandomForest) -classify each frame-> Recognized letters with noices -> Text Correction(Pipeline[RemoveRepetitionsStrategy, MajorityVoteStrategy, ChatGPTStartegy]) -> Corrected Text
+```
 
 ## Overview
 
@@ -123,4 +137,4 @@ Contributions are welcome. Please open issues or submit pull requests if you hav
 
 ## Experiments summary
 
-![Tests Summary](./tests_summary.md)
+![Tests Summary](./experiments.md)

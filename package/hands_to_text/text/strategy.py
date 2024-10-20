@@ -198,7 +198,7 @@ class ChatGPTStrategy(TextProcessingStrategy):
             messages=[
                 {
                     "role": "user",
-                    "content": f"Correct noiced text collected from ASL classification and return only the corrected sequence: {text}",
+                    "content": f"Transform ASL letters sequence to readable sentence and you must send only result sentence: {text}",
                 }
             ],
         )

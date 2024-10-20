@@ -1,5 +1,6 @@
 import cv2
-from hands_to_text.video.images import draw_classbox, process_frame, read_hands_models
+from hands_to_text.video.images import draw_classbox
+from hands_to_text.video.services.rf import RandomForestModelService
 
 from httfe.core.config import settings
 from httfe.services.text import TextService
@@ -18,7 +19,7 @@ class CameraService:
 
     def __init__(self):
         self.cap = cv2.VideoCapture(settings().device.idx)
-        self.model, self.hands = read_hands_models(settings().hands.path)
+        self.model_srv = RandomForestModelService(settings().hands.path)
 
     def read_frame(self):
         if self.cap is None or not self.cap.isOpened():
@@ -51,7 +52,7 @@ class CameraService:
                 continue
 
             img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            chbox = process_frame(img, self.model, self.hands)
+            chbox = self.model_srv.predict(img)
 
             if chbox:
                 draw_classbox(img, chbox)

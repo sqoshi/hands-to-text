@@ -23,7 +23,7 @@ class HandsModelSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="HANDS_")
 
     path: str = Field(
-        "models/model.pickle",
+        "/home/piotr/Workspaces/studies/htt-models/models/rf.pickle",
         description="Path to hands random forest model",
         json_schema_extra={"env": "PATH"},
     )

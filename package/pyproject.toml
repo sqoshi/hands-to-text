@@ -21,6 +21,7 @@ fuzzy = "^1.2.2"
 textdistance = "^4.6.3"
 g4f = "^0.3.2.8"
 openai = "^1.51.2"
+pytest-dotenv = "^0.5.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"

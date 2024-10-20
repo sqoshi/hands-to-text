@@ -103,7 +103,7 @@
 
       function startAutoUpdates() {
         updateText();
-        updateTextCorrected();
+        // updateTextCorrected();
         textUpdateInterval = setInterval(updateText, 2000); // Update text every 2 seconds
       }
 
@@ -114,7 +114,7 @@
       // Initialize auto updates when the page loads
       window.onload = function () {
         // You may choose to not start auto updates until the camera is started
-        // startAutoUpdates();
+        startAutoUpdates();
       };
     </script>
   </body>

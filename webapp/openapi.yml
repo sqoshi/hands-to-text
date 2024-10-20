@@ -1,0 +1,245 @@
+openapi: 3.1.0
+info:
+  title: FastAPI
+  version: 0.1.0
+paths:
+  /video/feed:
+    get:
+      tags:
+        - video
+      summary: Video Feed
+      operationId: video_feed_video_feed_get
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+
+  /video/camera:
+    put:
+      tags:
+        - video
+      summary: Manage Camera
+      operationId: manage_camera_video_camera_put
+      parameters:
+        - name: action
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - start
+              - stop
+            title: Action
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CameraResponse"
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+
+  /chat/:
+    get:
+      tags:
+        - chat
+      summary: Get Chat
+      operationId: get_chat_chat__get
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatHistoryResponse"
+    post:
+      tags:
+        - chat
+      summary: Send Chat
+      operationId: send_chat_chat__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatMessage"
+        required: true
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatResponse"
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+
+  /text/:
+    get:
+      tags:
+        - text
+      summary: Get Text
+      operationId: get_text_text__get
+      parameters:
+        - name: corrected
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+            title: Corrected
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TextResponse"
+        "422":
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HTTPValidationError"
+    delete:
+      tags:
+        - text
+      summary: Reset Text
+      operationId: reset_text_text__delete
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TextResetResponse"
+
+  /:
+    get:
+      summary: Index
+      operationId: index__get
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            text/html:
+              schema:
+                type: string
+
+components:
+  schemas:
+    CameraResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          title: Status
+        message:
+          anyOf:
+            - type: string
+            - type: null
+          title: Message
+      title: CameraResponse
+
+    ChatHistoryResponse:
+      type: object
+      required:
+        - status
+        - chat
+      properties:
+        status:
+          type: string
+          title: Status
+        chat:
+          type: string
+          title: Chat
+      title: ChatHistoryResponse
+
+    ChatMessage:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          title: Text
+      title: ChatMessage
+
+    ChatResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          title: Status
+        message:
+          anyOf:
+            - type: string
+            - type: null
+          title: Message
+      title: ChatResponse
+
+    HTTPValidationError:
+      type: object
+      properties:
+        detail:
+          type: array
+          items:
+            $ref: "#/components/schemas/ValidationError"
+          title: Detail
+      title: HTTPValidationError
+
+    TextResetResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          title: Status
+      title: TextResetResponse
+
+    TextResponse:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          title: Text
+      title: TextResponse
+
+    ValidationError:
+      type: object
+      required:
+        - loc
+        - msg
+        - type
+      properties:
+        loc:
+          type: array
+          items:
+            anyOf:
+              - type: string
+              - type: integer
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      title: ValidationError

@@ -1,4 +1,3 @@
-import asyncio
 import logging
 
 import openai
@@ -19,25 +18,23 @@ class ChatService:
     def __init__(self):
         openai.api_key = settings().chat.key
         self.history = []
-        self.model_name = "gpt-4.0"
+        self.model_name = "gpt-4o"
 
-    async def send_chat(self, text):
+    def send_chat(self, text):
         self.history.append(f"You: {text}")
         logging.debug("chat sending..")
 
-        response = await asyncio.to_thread(
-            openai.chat.completions.create(
-                model=self.model_name,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": f"Answear : {text}",
-                    }
-                ],
-            )
+        response = openai.chat.completions.create(
+            model=self.model_name,
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"Answer briefly and shortly on: {text}",
+                }
+            ],
         )
         logging.debug("chat response %s", response)
-        assistant_response = response.choices[0].message["content"]
+        assistant_response = response.choices[0].message.content
         self.history.append(f"Assistant: {assistant_response}")
 
     def get_history(self):
