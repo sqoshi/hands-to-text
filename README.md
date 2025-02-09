@@ -2,7 +2,7 @@
 
 <div align="center">
   <a href="https://github.com/sqoshi/hands-to-text/blob/master/docs/landscape.png">
-    <img src="https://github.com/sqoshi/hands-to-text/raw/master/docs/landscape.png" alt="Logo" width="640" height="240">
+    <img src="https://github.com/sqoshi/hands-to-text/raw/master/docs/landscape.png" alt="Logo">
   </a>
 </div>
 <br />
