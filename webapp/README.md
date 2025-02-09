@@ -1,16 +1,87 @@
-# webapp
+<a id="readme-top"></a>
 
-![img](https://github.com/sqoshi/hands-to-text/blob/master/webapp/example.png)
+[![Contributors][contributors-shield]](https://github.com/sqoshi/hands-to-text/graphs/contributors)
+[![Forks][forks-shield]](https://github.com/sqoshi/hands-to-text/network/members)
+[![Stargazers][stars-shield]](https://github.com/sqoshi/hands-to-text/stargazers)
+[![Issues][issues-shield]](https://github.com/sqoshi/hands-to-text/issues)
 
-## Introduction
+<br />
+<div align="center">
+  <a href="https://github.com/sqoshi/hands-to-text/blob/master/docs/landscape.png">
+    <img src="docs/landscape.png" alt="Logo" width="160" height="80">
+  </a>
 
-This tool has been created for hard of hearing individuals, it is web application with camera and few button that allow to ask questions to ChatGPT, with ASL letters. And containered with docker, so everybody can download it and use it.
+<h3 align="center">hands-to-text</h3>
 
-## Usage
+  <p align="center">
+    Python package designed to convert sign language frames from video into readable text.
+    <br />
+    <a href="https://github.com/sqoshi/hands-to-text"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/sqoshi/hands-to-text">View Demo</a>
+    &middot;
+    <a href="https://github.com/sqoshi/hands-to-text/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    &middot;
+    <a href="https://github.com/sqoshi/hands-to-text/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+  </p>
+</div>
+
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li><a href="#about-the-project">About The Project</a></li>
+    <li><a href="#built-with">Built With</a></li>
+    <li><a href="#getting-started">Getting Started</a></li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+  </ol>
+</details>
+
+## About The Project
+
+The Hands-to-Text application is a FastAPI-based web tool designed to assist hard-of-hearing individuals in communicating with ChatGPT using American Sign Language (ASL) letters. This web application enables users to ask questions to ChatGPT through a hand gesture recognition system, making AI-powered conversations more accessible.
+
+Built with Python and FastAPI, the application ensures a lightweight and efficient backend for real-time interaction. To maintain error-free communication between the backend API and the frontend templates, Pydantic is used for data validation. Additionally, sensitive data, such as the ChatGPT API key, is managed securely using Pydantic models and environment variables to prevent unauthorized access.
+
+For text processing, the application integrates the OpenAI API, which corrects and refines input text before sending it to ChatGPT. The Hands-to-Text package, specifically designed for this project, handles AI models that recognize and interpret hand gestures. To detect hands and extract ASL letters from video input, the system leverages MediaPipe, a powerful computer vision library for precise hand tracking.
+
+To ensure high-performance and scalable deployment, the application runs on Uvicorn, a modern ASGI server optimized for fast execution. Additionally, the entire system is containerized using Docker, allowing users to run it seamlessly on their local machines with just a ChatGPT API key.
+
+![img](https://github.com/sqoshi/hands-to-text/blob/master/docs/plant.png)
+
+Ultimately, this project aims to bridge communication gaps by enabling ASL users to interact with ChatGPT effortlessly, making digital conversations more inclusive and accessible.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Built With
+
+* Python
+* OpenCV
+* MediaPipe
+* Hands-to-Text
+* Pydantic
+* Pydantic-Settings
+* FastAPI
+* OpenAI
+* Uvicorn
+* Python-Dotenv
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Getting Started
+
+To get started with hands-to-text web application, follow these steps:
+
+### Prerequirements
 
 It is required to generate openapikey from [page](https://platform.openai.com/).
 
-```shellscript
+### Installation
+
+Install via pip artifactory:
+
+```sh
     docker run --network host \
         --name htt --rm -it \
         -e CHATGPT_KEY=<KEY> \
@@ -20,25 +91,49 @@ It is required to generate openapikey from [page](https://platform.openai.com/).
         ghcr.io/sqoshi/hands-to-text:0.1.1
 ```
 
-0. Open localhost:8000
-1. Start Camera
-2. Use ASL to write sentence
-3. Stop Camera
-4. Correct Text
-5. Send Chat
-6. Read chat response, history of whole talk is saved
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Workflow
+## Usage
 
-![img](https://github.com/sqoshi/hands-to-text/blob/master/webapp/plant.png)
+### Documentation
 
+Interactive api documentation is available under `/docs` endpoint.
 
-## Openapi
+### Web
 
-Interactive api is available under `/docs` endpoint.
+![img](https://github.com/sqoshi/hands-to-text/blob/master/docs/examplenew.png)
 
-![img](https://github.com/sqoshi/hands-to-text/blob/master/webapp/openapi.yml)
+1. Open the Application - Navigate to localhost:8000 in your browser.
+1. Start the Camera - Enable your camera to begin recognizing ASL gestures.
+1. Use ASL to Write a Sentence - Sign letters in front of the camera to form a sentence.
+1. Stop the Camera - Once you've completed your input, turn off the camera.
+1. Correct the Text - Review and edit the detected text for accuracy.
+1. Send the Chat - Submit your message to ChatGPT for a response.
+1. Read the Response - View ChatGPT’s reply, with the entire conversation history saved for reference.
 
-## Technologies
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-Application has been fully written in `python` with framework `fastapi` to make web ui for every user, best practices consider to use `pydantic` models for error prune communication between backend api and frontend templates with `javascripts`. Application has somekind of secrets as `chatgpt` apikey, so `pydantic_models` has been used to hide secrets in injectable enviornment. `openai` library has been used for communication with ChatGPT either to answer the question or correct the text. For models managements package `hands-to-text` designed and created specially for this web application. Some of models require the hand detection, so for finding a box with hand we used `mediapipe`. Application has been deployed with modern `uvicorn`. And finally whole program is stored as a `docker` container, so everybody can run it on local machine, having just key for `chatgpt`.
+## Roadmap
+
+* [x] Phase 1: MVP
+  * [x] Basic ASL Recognition - Implement hand tracking and ASL letter detection using MediaPipe.
+  * [x] FastAPI Backend - Set up a lightweight backend with FastAPI for handling requests.
+  * [x] Frontend UI - Create a simple web UI with JavaScript and HTML to capture ASL input.
+  * [x] Text Correction - Integrate OpenAI API for autocorrection of recognized ASL sequences.
+  * [x] ChatGPT Integration - Enable users to send corrected text to ChatGPT and receive responses.
+  * [x] Basic Dockerization - Package the application in a Docker container for easy deployment.
+
+* [x] Phase 2: Enhanced Features
+  * [x] Improve ASL Recognition - Enhance gesture recognition with better AI models (e.g., custom CNNs or LSTMs).
+  * [x] Real-Time Text Processing - Display live text suggestions while signing.
+  * [x] User Profiles & History - Implement session-based chat history storage for users.
+  * [x] Security Enhancements - Improve API key handling, user authentication, and request validation.
+
+* [x] Phase 3: Advanced Capabilities
+  * [x] Customizable AI Models - Train and fine-tune custom models for better ASL recognition accuracy.
+  * [ ] Multi-Hand Gesture Support - Recognize complex gestures (e.g., words instead of just letters).
+  * [ ] Speech Output - Convert ASL text responses into speech output for additional accessibility.
+  * [ ] Mobile Support - Develop a PWA (Progressive Web App) or mobile app for on-the-go use.
+  * [ ] Cloud Deployment - Deploy on AWS/GCP/Azure for global accessibility.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
