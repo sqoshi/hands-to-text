@@ -7,8 +7,8 @@
 
 <br />
 <div align="center">
-  <a href="https://github.com/sqoshi/hands-to-text">
-    <img src="docs/landscape.png" alt="Logo" width="80" height="80">
+  <a href="https://github.com/sqoshi/hands-to-text/docs/landscape.png">
+    <img src="docs/landscape.png" alt="Logo" width="160" height="80">
   </a>
 
 <h3 align="center">hands-to-text</h3>
