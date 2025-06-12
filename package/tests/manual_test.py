@@ -1,6 +1,6 @@
 import cv2
 
-from hands_to_text.video import CNNModelService, RandomForestModelService
+from hands_to_text.video import LeeNetModelService, RandomForestModelService
 from hands_to_text.video.images import draw_classbox
 from hands_to_text.video.processor import FramesProcessor
 
@@ -40,7 +40,7 @@ def run_realtime_inference(frames_processor):
 
 
 if __name__ == "__main__":
-    service = CNNModelService(
+    service = LeeNetModelService(
         # path="/home/piotr/Workspaces/studies/htt-models/models/cnn.pth"
         path="/home/piotr/Workspaces/studies/htt-models/models/cnnasl.pth"
     )

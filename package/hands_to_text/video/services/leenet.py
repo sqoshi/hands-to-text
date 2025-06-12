@@ -11,7 +11,7 @@ from hands_to_text.video.services.abstract import ModelService
 # import uuid
 
 
-class CNNModelService(ModelService):
+class LeeNetModelService(ModelService):
     def __init__(self, path: str):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = self._load(path)

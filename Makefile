@@ -29,14 +29,15 @@ docker-build: ## Build the Docker image
 	-t ${ARTIFACTORY}sqoshi/hands-to-text:$(VERSION) \
 	.
 
-docker-run:  ## Run the Docker container
+docker-run:  docker-build ## Run the Docker container
 	docker run --network host \
 	--name htt --rm -it \
 	-e DISPLAY=${DISPLAY} \
+	-e CHATGPT_KEY=${CHATGPT_KEY} \
 	-e HANDS_PATH=/app/models/rf.pickle \
 	--device /dev/video0:/dev/video0 \
 	-v /tmp/.X11-unix:/tmp/.X11-unix \
-	ghcr.io/sqoshi/hands-to-text:0.1.1
+	ghcr.io/sqoshi/hands-to-text:latest
 
 help: ## Print help with command name and comment for each target
 	@echo "Available targets:"

@@ -5,37 +5,180 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hand Gesture Recognition</title>
     <link rel="stylesheet" href="/static/styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   </head>
   <body>
-    <div class="container">
-      <div class="left">
-        <div class="video-container">
-          <img id="video" alt="video" />
+    <div class="app-container">
+      <!-- Header with app name and theme toggle -->
+      <header class="app-header">
+        <h1><i class="fas fa-hand-paper"></i> Hand Gesture Recognition</h1>
+        <div class="controls">
+          <button id="theme-toggle" class="icon-btn" title="Toggle Dark/Light Mode">
+            <i class="fas fa-moon"></i>
+          </button>
+          <button id="sidebar-toggle" class="icon-btn" title="Toggle Sidebar">
+            <i class="fas fa-bars"></i>
+          </button>
         </div>
-        <div class="button-container">
-          <button class="btn" onclick="manageCamera('start')">Start Camera</button>
-          <button class="btn" onclick="manageCamera('stop')">Stop Camera</button>
-          <button class="btn" onclick="resetText()">Reset Text</button>
-          <button class="btn" onclick="correctText()">Correct Text</button>
-          <button class="btn" onclick="sendChat()">Send Chat</button>
+      </header>
+
+      <!-- Main content area -->
+      <div class="main-content">
+        <!-- Left section with video and controls -->
+        <div class="content-panel video-panel">
+          <div class="panel-header">
+            <h2>Camera Feed</h2>
+            <div class="status-indicator" id="camera-status">
+              <span class="status-dot offline"></span>
+              <span class="status-text">Camera Off</span>
+            </div>
+          </div>
+          <div class="video-container">
+            <img id="video" alt="Camera Feed" />
+            <div class="video-overlay" id="video-placeholder">
+              <i class="fas fa-video-slash"></i>
+              <p>Camera is off</p>
+            </div>
+          </div>
+          <div class="button-container">
+            <button class="btn primary-btn" onclick="manageCamera('start')">
+              <i class="fas fa-video"></i> Start Camera
+            </button>
+            <button class="btn danger-btn" onclick="manageCamera('stop')">
+              <i class="fas fa-stop-circle"></i> Stop Camera
+            </button>
+          </div>
         </div>
-      </div>
-      <div class="right">
-        <textarea class="text-area" id="text-area" readonly></textarea>
-        <textarea class="text-area" id="text-area-corrected" readonly></textarea>
-        <textarea class="text-area" id="chat-area" readonly></textarea>
+
+        <!-- Middle section with text input/output -->
+        <div class="content-panel text-panel">
+          <div class="tabs">
+            <button class="tab-btn active" data-target="raw-text">Raw Input</button>
+            <button class="tab-btn" data-target="corrected-text">Corrected Text</button>
+          </div>
+
+          <div class="tab-content active" id="raw-text">
+            <div class="panel-header">
+              <h2>Raw Text Input</h2>
+              <button class="icon-btn small" onclick="resetText()" title="Reset Text">
+                <i class="fas fa-eraser"></i>
+              </button>
+            </div>
+            <textarea class="text-area" id="text-area" readonly></textarea>
+          </div>
+
+          <div class="tab-content" id="corrected-text">
+            <div class="panel-header">
+              <h2>Corrected Text</h2>
+              <button class="icon-btn small" onclick="correctText()" title="Correct Text">
+                <i class="fas fa-spell-check"></i>
+              </button>
+            </div>
+            <textarea class="text-area" id="text-area-corrected"></textarea>
+            <button class="btn send-btn" onclick="sendChat()">
+              <i class="fas fa-paper-plane"></i> Send to Chat
+            </button>
+          </div>
+        </div>
+
+        <!-- Sidebar with chat history (toggleable) -->
+        <div class="sidebar" id="sidebar">
+          <div class="panel-header">
+            <h2>Chat History</h2>
+            <button class="icon-btn small" id="close-sidebar">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="chat-container">
+            <div class="chat-messages" id="chat-messages"></div>
+            <textarea class="text-area chat-area" id="chat-area" readonly></textarea>
+          </div>
+        </div>
       </div>
     </div>
 
     <script>
       let textUpdateInterval;
 
+      // UI related functions
+      document.addEventListener('DOMContentLoaded', function() {
+        // Tab switching functionality
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        tabButtons.forEach(button => {
+          button.addEventListener('click', () => {
+            // Deactivate all tabs
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Activate the clicked tab
+            button.classList.add('active');
+            const targetId = button.getAttribute('data-target');
+            document.getElementById(targetId).classList.add('active');
+          });
+        });
+
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        themeToggle.addEventListener('click', () => {
+          document.body.classList.toggle('light-mode');
+          if (document.body.classList.contains('light-mode')) {
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+          } else {
+            themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+          }
+        });
+
+        // Sidebar toggle functionality
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const closeSidebar = document.getElementById('close-sidebar');
+
+        sidebarToggle.addEventListener('click', () => {
+          sidebar.classList.toggle('active');
+        });
+
+        closeSidebar.addEventListener('click', () => {
+          sidebar.classList.remove('active');
+        });
+
+        // Start auto updates
+        startAutoUpdates();
+
+        // Format chat messages when received
+        updateChat();
+      });
+
+      // Camera status update
+      function updateCameraStatus(isOn) {
+        const statusDot = document.querySelector('.status-dot');
+        const statusText = document.querySelector('.status-text');
+        const placeholder = document.getElementById('video-placeholder');
+
+        if (isOn) {
+          statusDot.classList.remove('offline');
+          statusDot.classList.add('online');
+          statusText.textContent = 'Camera On';
+          placeholder.style.display = 'none';
+        } else {
+          statusDot.classList.remove('online');
+          statusDot.classList.add('offline');
+          statusText.textContent = 'Camera Off';
+          placeholder.style.display = 'flex';
+        }
+      }
+
+      // API related functions
       function correctText() {
         fetch("/text/?corrected=true")
           .then((response) => response.json())
           .then((data) => {
-            console.log(data);
             document.getElementById("text-area-corrected").value = data.text;
+            // Show notification
+            showNotification("Text corrected successfully");
+          })
+          .catch(error => {
+            showNotification("Error correcting text", true);
           });
       }
 
@@ -44,6 +187,9 @@
           .then((response) => response.json())
           .then((data) => {
             document.getElementById("text-area").value = data.text;
+          })
+          .catch(error => {
+            console.error("Error fetching text:", error);
           });
       }
 
@@ -52,6 +198,10 @@
           .then((response) => response.json())
           .then(() => {
             updateText();
+            showNotification("Text reset successfully");
+          })
+          .catch(error => {
+            showNotification("Error resetting text", true);
           });
       }
 
@@ -63,19 +213,31 @@
               if (action === "start") {
                 document.getElementById("video").style.display = "block";
                 document.getElementById("video").src = "/video/feed";
-                startAutoUpdates(); // Start updating text when camera starts
+                updateCameraStatus(true);
+                startAutoUpdates();
+                showNotification("Camera started");
               } else {
                 document.getElementById("video").src = "";
-                stopAutoUpdates(); // Stop updating text when camera stops
+                updateCameraStatus(false);
+                stopAutoUpdates();
+                showNotification("Camera stopped");
               }
             } else {
-              alert(data.message);
+              showNotification(data.message, true);
             }
+          })
+          .catch(error => {
+            showNotification("Error managing camera", true);
           });
       }
 
       function sendChat() {
         const text = document.getElementById("text-area-corrected").value;
+        if (!text.trim()) {
+          showNotification("Please enter some text to send", true);
+          return;
+        }
+
         fetch("/chat/", {
           method: "POST",
           headers: {
@@ -87,9 +249,15 @@
           .then((data) => {
             if (data.status === "success") {
               updateChat();
+              showNotification("Message sent to chat");
+              // Clear the corrected text area after sending
+              document.getElementById("text-area-corrected").value = "";
             } else {
-              alert(data.message);
+              showNotification(data.message, true);
             }
+          })
+          .catch(error => {
+            showNotification("Error sending message", true);
           });
       }
 
@@ -97,25 +265,85 @@
         fetch("/chat/")
           .then((response) => response.json())
           .then((data) => {
-            document.getElementById("chat-area").value = data.chat;
+            const chatArea = document.getElementById("chat-area");
+            chatArea.value = data.chat;
+
+            // Also update the visual chat messages
+            formatChatMessages(data.chat);
+          })
+          .catch(error => {
+            console.error("Error updating chat:", error);
           });
+      }
+
+      function formatChatMessages(chatText) {
+        if (!chatText) return;
+
+        const messagesContainer = document.getElementById('chat-messages');
+        messagesContainer.innerHTML = ''; // Clear previous messages
+
+        // Simple parsing of chat text - assumes format: "User: message\nResponse: message"
+        const lines = chatText.split('\n');
+
+        lines.forEach(line => {
+          if (line.trim()) {
+            const messageDiv = document.createElement('div');
+
+            if (line.startsWith('User:')) {
+              messageDiv.className = 'message user-message';
+              messageDiv.innerHTML = `<div class="message-content">${line.substring(5).trim()}</div>`;
+            } else if (line.startsWith('Response:')) {
+              messageDiv.className = 'message response-message';
+              messageDiv.innerHTML = `<div class="message-content">${line.substring(9).trim()}</div>`;
+            } else {
+              messageDiv.className = 'message system-message';
+              messageDiv.innerHTML = `<div class="message-content">${line.trim()}</div>`;
+            }
+
+            messagesContainer.appendChild(messageDiv);
+          }
+        });
+
+        // Scroll to the bottom of the chat
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+
+      function showNotification(message, isError = false) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification ${isError ? 'error' : 'success'}`;
+        notification.innerHTML = `
+          <div class="notification-content">
+            <i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i>
+            <span>${message}</span>
+          </div>
+        `;
+
+        // Add to document
+        document.body.appendChild(notification);
+
+        // Show with animation
+        setTimeout(() => {
+          notification.classList.add('show');
+        }, 10);
+
+        // Auto hide after delay
+        setTimeout(() => {
+          notification.classList.remove('show');
+          setTimeout(() => {
+            notification.remove();
+          }, 300);
+        }, 3000);
       }
 
       function startAutoUpdates() {
         updateText();
-        // updateTextCorrected();
         textUpdateInterval = setInterval(updateText, 2000); // Update text every 2 seconds
       }
 
       function stopAutoUpdates() {
         clearInterval(textUpdateInterval);
       }
-
-      // Initialize auto updates when the page loads
-      window.onload = function () {
-        // You may choose to not start auto updates until the camera is started
-        startAutoUpdates();
-      };
     </script>
   </body>
 </html>

@@ -9,13 +9,13 @@ package-mode = true
 
 [tool.poetry.dependencies]
 python = "^3.10"
-opencv-python = ">=4.10.0.84"
-mediapipe = ">=0.10.15"
+opencv-python = ">=4.11.0.86"
+mediapipe = ">=0.10.21"
 hands-to-text = { path = "../package" }
-pydantic = "^2.9.2"
-pydantic-settings = "^2.5.2"
+pydantic = "^2.10.6"
+pydantic-settings = "^2.7.1"
 fastapi = "^0.115.2"
-openai = "^1.51.2"
+openai = "^1.61.1"
 uvicorn = "^0.31.1"
 python-dotenv = "^1.0.1"
 
@@ -56,7 +56,3 @@ known_first_party = ["black"]
 
 [tool.bandit]
 skips = ["B403", "B301"]
-
-[[tool.poetry.source]]
-name = "PyPI"
-priority = "primary"

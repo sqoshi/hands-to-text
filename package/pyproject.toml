@@ -9,18 +9,19 @@ package-mode = true
 
 [tool.poetry.dependencies]
 python = "^3.10"
-opencv-python = ">=4.10.0.84"
-mediapipe = ">=0.10.15"
+opencv-python = ">=4.11.0.86"
+mediapipe = ">=0.10.21"
 scikit-learn = "1.5.1"
 numpy = "*"
-transformers = "^4.45.2"
-torch = "^2.4.1"
+transformers = "^4.48.3"
+torch = "~2.5.1"
 autocorrect = "^2.6.1"
 wordninja = "^2.0.0"
 fuzzy = "^1.2.2"
 textdistance = "^4.6.3"
 g4f = "^0.3.2.8"
-openai = "^1.51.2"
+openai = "^1.61.1"
+torchvision = "~0.20.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
@@ -59,7 +60,3 @@ known_first_party = ["black"]
 
 [tool.bandit]
 skips = ["B403", "B301"]
-
-[[tool.poetry.source]]
-name = "PyPI"
-priority = "primary"
